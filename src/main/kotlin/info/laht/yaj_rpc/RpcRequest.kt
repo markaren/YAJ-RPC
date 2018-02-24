@@ -25,31 +25,79 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.annotations.SerializedName
-
-//sealed class RpcRequestParams {
-//
-//}
-//
-//class ListParams {
-//
-//}
-//
-//interface RpcRequest<E: RpcParams> {
-//
-//    val id: Any?
-//    val version: String
-//    val methodName: String
-//
-//    val params: E
-//
-//}
+import info.laht.yaj_rpc.parser.JsonParser
+import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 interface RpcRequest {
     val id: Any
     val version: String?
     val methodName: String?
     val params: RpcParams
+
+    val isNotification
+        get() = id == NO_ID
+
+
+    companion object {
+
+        fun fromJson(json: String): RpcRequest {
+            return JsonParser.gson.fromJson(json, RpcRequestImpl::class.java)
+        }
+
+        fun toJson(request: RpcRequest): String {
+            return JsonParser.gson.toJson(request)
+        }
+
+    }
+
 }
+
+//
+//object RpcRequestBuilder {
+//
+//    fun message(methodName: String, params: List<Any>? = null) : RpcRequest {
+//        val rpcParams = params?.let { RpcListParams(params) } ?: RpcNoParams
+//        return build(methodName, rpcParams, false)
+//    }
+//
+//    fun notification(methodName: String, params: List<Any>) : RpcRequest {
+//        return build(methodName, RpcListParams(params), true)
+//    }
+//
+//    fun message(methodName: String, params: Map<String, Any>? = null) : RpcRequest {
+//        val rpcParams = params?.let { RpcMapParams(params) } ?: RpcNoParams
+//        return build(methodName, rpcParams, false)
+//    }
+//
+//    fun notification(methodName: String, params: Map<String, Any>? = null) : RpcRequest {
+//        val rpcParams = params?.let { RpcMapParams(params) } ?: RpcNoParams
+//        return build(methodName, rpcParams, true)
+//    }
+//
+//    private fun build(methodName: String, params: RpcParams, isNotification: Boolean): RpcRequest {
+//        return RpcRequestImpl1(methodName, params).apply {
+//            if (!isNotification) {
+//                id = UUID.randomUUID().toString()
+//            }
+//        }
+//    }
+//
+//}
+//
+//
+//data class RpcRequestImpl1(
+//        @SerializedName(value = "method")
+//        override val methodName: String,
+//        override val params: RpcParams
+//): RpcRequest {
+//
+//    override var id: Any = NO_ID
+//
+//    @SerializedName(value = "jsonrpc")
+//    override val version: String = JSON_RPC_VERSION
+//
+//}
 
 /**
  * @author Lars Ivar Hatledal laht@ntnu.no.
@@ -70,21 +118,6 @@ class RpcRequestImpl internal constructor(): RpcRequest {
     override val params: RpcParams
         get() = _params ?: RpcNoParams
 
-    val isNotification: Boolean
-        get() = id === NO_ID
-
-//    fun hasMethod(): Boolean {
-//        return methodName != null
-//    }
-//
-//    fun hasParams(): Boolean {
-//        return params != null
-//    }
-//
-//    fun getParams(): RpcParams {
-//        return RpcParams(params)
-//    }
-
     override fun toString(): String {
         return mutableListOf<String>().apply {
 
@@ -94,8 +127,9 @@ class RpcRequestImpl internal constructor(): RpcRequest {
             if (id !== NO_ID) {
                 add("id=$id")
             }
+            add("isNotification=$isNotification")
 
-        }.joinToString(", ").let { "JsonRPCRequest($it)" }
+        }.joinToString(", ").let { "JsonRPCRequestImpl($it)" }
 
     }
 

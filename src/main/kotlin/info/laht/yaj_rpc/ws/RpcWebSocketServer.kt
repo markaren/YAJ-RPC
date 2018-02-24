@@ -12,7 +12,7 @@ import java.net.InetSocketAddress
 class RpcWebSocketServer(
         val port: Int,
         val handler: RpcHandler
-) {
+): AutoCloseable {
 
     private val ws = WebSocketServerImpl()
 
@@ -23,6 +23,8 @@ class RpcWebSocketServer(
     fun stop() {
         ws.stop()
     }
+
+    override fun close() = stop()
 
     inner class WebSocketServerImpl: WebSocketServer(InetSocketAddress(port)) {
 
@@ -35,7 +37,7 @@ class RpcWebSocketServer(
         }
 
         override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) {
-
+            LOG.info("Client disconnected")
         }
 
         override fun onMessage(conn: WebSocket, message: String) {

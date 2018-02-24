@@ -1,14 +1,23 @@
 package info.laht.yaj_rpc;
 
-public class SampleService extends RpcService {
+public class SampleService extends AbstractRpcService {
 
-    SampleService() {
+    public SampleService() {
         super(SampleService.class.getSimpleName());
     }
 
     @RpcMethod
     public int doubleInput(int i) {
         return i * 2;
+    }
+
+    @RpcMethod
+    public void returnNothing() {
+    }
+
+    @RpcMethod
+    public String helloWorld(String name) {
+        return "Hello " + name;
     }
 
     @RpcMethod

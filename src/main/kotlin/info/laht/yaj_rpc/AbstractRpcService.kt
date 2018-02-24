@@ -28,7 +28,7 @@ import java.lang.reflect.Method
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-open class RpcService(
+abstract class AbstractRpcService(
         val name: String
 ) {
 
@@ -40,24 +40,25 @@ open class RpcService(
                 exposedMethods.add(method)
             }
         }
-        LOG.info("RpcService created, named: $name")
+        LOG.info("RpcService '$name' created")
     }
 
     internal fun getCallDescription(): Map<String, Any> {
-        return mutableMapOf<String, Any>().also {
-            for (m in exposedMethods) {
-                val map1 = HashMap<String, Any>()
-                val list = mutableListOf<String>()
-                for (p in m.parameters) {
-                    list.add(p.name + ":" + p.type.simpleName)
-                }
-                val returnType = m.returnType
-                map1[PARAMS_KEY] = if (list.isEmpty()) "void" else list
-                map1[RESULT_KEY] = if (returnType == null) "void" else returnType.simpleName
 
-                it[m.name] = map1
+        fun toMap(m: Method): Map<String, Any> {
+            return mutableMapOf<String, Any>().also { map1 ->
+                val list = List(m.parameterCount, { i ->
+                    m.parameters[i].let {
+                        "${it.name}:${it.type.simpleName}"
+                    }
+                })
+                map1[PARAMS_KEY] = if (list.isEmpty()) "void" else list
+                map1[RESULT_KEY] = if (m.returnType == null) "void" else m.returnType.simpleName
             }
         }
+
+        return exposedMethods.associate { it.name to toMap(it)}
+
     }
 
     internal fun getExposedMethod(name: String, numParams: Int): Method? {
@@ -67,7 +68,7 @@ open class RpcService(
     }
 
     private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(RpcService::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(AbstractRpcService::class.java)
     }
 
 }

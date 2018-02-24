@@ -26,10 +26,7 @@ package info.laht.yaj_rpc.parser
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import info.laht.yaj_rpc.RpcParams
-import info.laht.yaj_rpc.RpcParamsDeserializer
-import info.laht.yaj_rpc.RpcRequestImpl
-import info.laht.yaj_rpc.RpcResponse
+import info.laht.yaj_rpc.*
 import java.lang.reflect.Type
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -42,20 +39,24 @@ object JsonParser {
 
     private val LOG: Logger = LoggerFactory.getLogger(JsonParser::class.java)
 
-    private var gson: Gson? = null
-    private val builder = GsonBuilder()
-            .serializeNulls()
-            .registerTypeAdapter(RpcParams::class.java, RpcParamsDeserializer())
-            .setPrettyPrinting()
-
     private var changed = true
+    private var _gson: Gson? = null
 
-    private fun getGson(): Gson {
+    private val builder by lazy {
+        GsonBuilder()
+                .serializeNulls()
+                .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
+                .setPrettyPrinting()
+    }
+
+
+    val gson: Gson
+    get() {
         if (changed) {
-            gson = builder.create()
             changed = false
+            _gson = builder.create()
         }
-        return gson!!
+        return _gson!!
     }
 
     fun registerTypeAdapter(type: Type, typeAdapter: Any) {
@@ -63,26 +64,26 @@ object JsonParser {
         changed = true
     }
 
-    fun toJson(`object`: Any): String {
-        return getGson().toJson(`object`)
-    }
+//    fun toJson(`object`: Any?): String {
+//        return getGson().toJson(`object`)
+//    }
+//
+//    fun <T> fromJson(json: String, clazz: Class<T>): T {
+//        return getGson().fromJson(json, clazz)
+//    }
 
-    fun <T> fromJson(json: String, clazz: Class<T>): T {
-        return getGson().fromJson(json, clazz)
-    }
-
-    fun parseRequest(json: String): RpcRequestImpl {
-        return getGson().fromJson(json, RpcRequestImpl::class.java)
-    }
-
-    fun parseResponse(json: String): RpcResponse? {
-        try {
-            return getGson().fromJson(json, RpcResponse::class.java)
-        } catch (ex: IllegalStateException) {
-            LOG.error("Failed to parse response from: {}", json, ex)
-        }
-
-        return null
-    }
+//    fun parseRequest(json: String): RpcRequestImpl {
+//        return getGson().fromJson(json, RpcRequestImpl::class.java)
+//    }
+//
+//    fun parseResponse(json: String): RpcResponse? {
+//        try {
+//            return getGson().fromJson(json, RpcResponse::class.java)
+//        } catch (ex: IllegalStateException) {
+//            LOG.error("Failed to parse response from: {}", json, ex)
+//        }
+//
+//        return null
+//    }
 
 }

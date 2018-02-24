@@ -6,13 +6,15 @@ import java.util.HashMap
 /**
  * @author Lars Ivar Hatledal
  */
-class RpcError @JvmOverloads protected constructor(
+class RpcError @JvmOverloads internal constructor(
         private val code: Int,
         private val message: String,
         private val data: Any? = null
 ) {
 
-    enum class ErrorType private constructor(val code: Int) {
+    enum class ErrorType constructor(
+            private val code: Int
+    ) {
 
         METHOD_NOT_FOUND(-32601), PARSE_ERROR(-32700), INVALID_REQUEST(-32600), INVALID_PARAMS(-32602), INTERNAL_ERROR(-32603);
 

@@ -1,6 +1,7 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.*
+import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.reflect.Type
 
 sealed class RpcParams {
@@ -14,8 +15,23 @@ object RpcNoParams: RpcParams() {
         get() = 0
 }
 
-class RpcListParams(
-        val value: MutableList<JsonElement>
+class RpcListParams<out E>(
+        val value: List<E>
+): RpcParams() {
+
+    constructor(vararg value: E): this(value.toList())
+
+    override val paramCount: Int
+        get() = value.size
+
+    override fun toString(): String {
+        return "RpcListParams(value=$value)"
+    }
+
+}
+
+class RpcMapParams<out E>(
+        val value: Map<String, E>
 ): RpcParams() {
 
     override val paramCount: Int
@@ -27,50 +43,23 @@ class RpcListParams(
 
 }
 
-class RpcMapParams(
-        val value: Map<String, JsonElement>
-): RpcParams() {
+class RpcParamsTypeAdapter : JsonDeserializer<RpcParams>, JsonSerializer<RpcParams> {
 
-    override val paramCount: Int
-        get() = value.size
+    override fun serialize(src: RpcParams, typeOfSrc: Type, context: JsonSerializationContext): JsonElement? {
 
-    override fun toString(): String {
-        return "RpcListParams(value=$value)"
+        return when(src) {
+            RpcNoParams -> null
+            is RpcListParams<*> -> JsonParser.gson.toJsonTree(src.value)
+            is RpcMapParams<*> -> JsonParser.gson.toJsonTree(src.value)
+        }
+
     }
 
-}
-
-class RpcParamsDeserializer: JsonDeserializer<RpcParams> {
     override fun deserialize(json: JsonElement, type: Type, context: JsonDeserializationContext): RpcParams {
         return when {
-            json.isJsonArray -> RpcListParams(json.asJsonArray.toMutableList())
-            json.isJsonObject -> RpcMapParams(json.asJsonObject.entrySet().associate { it.key to it.value })
+            json.isJsonArray -> RpcListParams<JsonElement>(json.asJsonArray.toMutableList())
+            json.isJsonObject -> RpcMapParams<JsonElement>(json.asJsonObject.entrySet().associate { it.key to it.value })
             else ->  RpcNoParams
         }
-
     }
-}
-
-class Test {
-
-    val params: RpcParams? = null
-
-}
-
-fun main (args: Array<String>) {
-
-    val json = """
-        {
-            "params": {"per": "nils"}
-        }
-        """
-
-    val gson = GsonBuilder().apply {
-        registerTypeAdapter(RpcParams::class.java, RpcParamsDeserializer())
-    }.create()
-
-
-
-    println(gson.fromJson(json, Test::class.java).params)
-
 }

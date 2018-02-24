@@ -26,21 +26,42 @@ package info.laht.yaj_rpc
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
+import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.IllegalStateException
 import java.lang.reflect.Type
+
+interface RpcResponse {
+
+    val id: Any
+    val version: String?
+
+    val error: RpcError?
+
+    fun <T> getResult(clazz: Class<T>): T?
+
+    companion object {
+
+        fun fromJson(json: String): RpcResponse {
+            return JsonParser.gson.fromJson(json, RpcResponseImpl::class.java)
+        }
+
+    }
+
+}
 
 /**
  *
  * @author Lars Ivar Hatledal
  */
-class RpcResponse internal constructor() {
+class RpcResponseImpl internal constructor(): RpcResponse {
 
     @SerializedName("jsonrpc")
-    private val version: String? = null
+    override val version: String? = null
 
-    val id: Any? = null
+    override val id: Any = NO_ID
+    override val error: RpcError? = null
     private val result: String? = null
-    val error: RpcError? = null
+
 
     val isVoid: Boolean
         get() = hasResult && result == null
@@ -50,19 +71,19 @@ class RpcResponse internal constructor() {
 
 
     val hasResult: Boolean
-        get() = result != null
+        get() = !hasError
 
-    fun <T> getResult(clazz: Class<T>): T? {
+    override fun <T> getResult(clazz: Class<T>): T? {
         return if (hasResult) {
             Gson().fromJson(result, clazz)
         } else null
     }
 
-    fun <T> getResult(clazz: Type): T {
-        return if (hasResult) {
-            Gson().fromJson<T>(result, clazz)
-        } else throw IllegalStateException("Response has no result!")
-    }
+//    fun <T> getResult(clazz: Type): T {
+//        return if (hasResult) {
+//            Gson().fromJson<T>(result, clazz)
+//        } else throw IllegalStateException("Response has no result!")
+//    }
 
     override fun toString(): String {
         return "JsonRPCResponse{" + "jsonrpc=" + version + ", id=" + id + ", response=" + (if (hasError) error else result) + '}'.toString()

@@ -24,7 +24,7 @@
 
 package info.laht.yaj_rpc
 
-import com.google.gson.Gson
+import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.reflect.Method
@@ -35,14 +35,14 @@ typealias Converter<E> = (JsonElement) -> E
 
 class RpcHandler {
 
-    private val services = mutableMapOf<String, RpcService>()
+    private val services = mutableMapOf<String, AbstractRpcService>()
     private val converters = mutableMapOf<Class<*>, Converter<*>>()
 
-    fun addService(service: RpcService) {
+    fun addService(service: AbstractRpcService) {
         services[service.name] = service
     }
 
-    fun removeService(service: RpcService) {
+    fun removeService(service: AbstractRpcService) {
         services.remove(service.name)
     }
 
@@ -53,15 +53,15 @@ class RpcHandler {
     fun getOpenMessage(): String {
         return services.entries.associate {
             it.key to it.value.getCallDescription()
-        }.let { JsonParser.toJson(it) }
+        }.let { JsonParser.gson.toJson(it) }
     }
 
     fun handle(json: String): String? {
-        val req: RpcRequestImpl
+        val req: RpcRequest
         try {
-            req = JsonParser.parseRequest(json)
+            req = RpcRequest.fromJson(json)
         } catch (ex: Exception) {
-            val msg = "Exception encountered while handling json string: $json"
+            val msg = "Exception encountered while parsing json string: $json"
             LOG.error(msg, ex)
             return createErrorResponse(null, RpcError.ErrorType.PARSE_ERROR, msg)
         }
@@ -80,7 +80,7 @@ class RpcHandler {
         return handle(req)
     }
 
-    private fun handle(req: RpcRequestImpl): String? {
+    private fun handle(req: RpcRequest): String? {
         val id = req.id
         val split = req.methodName!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (split.size != 2) {
@@ -106,14 +106,14 @@ class RpcHandler {
         val params = req.params
         return when(params) {
             RpcNoParams -> handleNoParams(service, method, id, req.isNotification)
-            is RpcListParams -> handleListParams(service, method, params.value, id, req.isNotification)
-            is RpcMapParams -> handleMapParams(service, method, params.value, id, req.isNotification)
+            is RpcListParams<*> -> handleListParams(service, method, params.value as List<JsonElement>, id, req.isNotification)
+            is RpcMapParams<*> -> handleMapParams(service, method, params.value as Map<String, JsonElement>, id, req.isNotification)
         }
 
 
     }
 
-    private fun handleNoParams(service: RpcService, method: Method, id: Any, isNotification: Boolean): String? {
+    private fun handleNoParams(service: AbstractRpcService, method: Method, id: Any, isNotification: Boolean): String? {
         if (method.parameterCount > 0) {
             return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND)
         }
@@ -127,7 +127,7 @@ class RpcHandler {
 
     }
 
-    private fun handleListParams(service: RpcService, method: Method, params: MutableList<JsonElement>, id: Any, isNotification: Boolean): String? {
+    private fun handleListParams(service: AbstractRpcService, method: Method, params: List<JsonElement>, id: Any, isNotification: Boolean): String? {
 
         if (params.size != method.parameterCount) {
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, "params.length != method.getParameterCount()")
@@ -140,7 +140,7 @@ class RpcHandler {
                 if (isNotification) {
                     null
                 } else {
-                    val invoke = method.invoke(service, *typedParams.toTypedArray()) ?: "void"
+                    val invoke = method.invoke(service, *typedParams.toTypedArray())
                     createResponse (invoke, id)
                 }
             } catch (ex: Exception) {
@@ -157,7 +157,7 @@ class RpcHandler {
 
     }
 
-    private fun handleMapParams(service: RpcService, method: Method, params: Map<String, JsonElement>, id: Any, isNotification: Boolean): String? {
+    private fun handleMapParams(service: AbstractRpcService, method: Method, params: Map<String, JsonElement>, id: Any, isNotification: Boolean): String? {
 
         if (method.parameterCount != params.size) {
             val msg = "Number of method parameters and params does not match '$method'"
@@ -166,7 +166,8 @@ class RpcHandler {
         }
         val collect = params.keys.map({ key -> indexOf(key, method) })
         if (collect.contains(-1)) {
-            val msg = "mismatch between one or more parameter names and params keys, params: $params, parameterNames: ${getParameterNames(method)}"
+            val parameterNames = method.parameters.map { it.name }
+            val msg = "mismatch between one or more parameter names and params keys, params: $params, parameterNames: $parameterNames"
             LOG.error(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, msg)
         }
@@ -182,15 +183,15 @@ class RpcHandler {
 
         return List<Any>(types.size, {i->
             val arg = types[i]
+            val param = params[i]
             when {
-                converters.containsKey(arg) -> converters[arg]!!.invoke(params[i]!!)!!
-                arg == Boolean::class.java || arg == Boolean::class.javaPrimitiveType -> params[i].asBoolean
-                arg == Long::class.java || arg == Long::class.javaPrimitiveType -> params[i].asLong
-                arg == Int::class.java || arg == Int::class.javaPrimitiveType -> params[i].asInt
-                arg == Float::class.java || arg == Float::class.javaPrimitiveType -> params[i].asFloat
-                arg == Double::class.java || arg == Double::class.javaPrimitiveType -> params[i].asDouble
-                params[i].isJsonObject -> Gson().fromJson(params[i], arg)
-                else -> throw AssertionError()
+                converters.containsKey(arg) -> converters[arg]!!.invoke(param)!!
+                arg == Boolean::class.java || arg == Boolean::class.javaPrimitiveType -> param.asBoolean
+                arg == Long::class.java || arg == Long::class.javaPrimitiveType -> param.asLong
+                arg == Int::class.java || arg == Int::class.javaPrimitiveType -> param.asInt
+                arg == Float::class.java || arg == Float::class.javaPrimitiveType -> param.asFloat
+                arg == Double::class.java || arg == Double::class.javaPrimitiveType -> param.asDouble
+                else -> JsonParser.gson.fromJson(param, arg)
             }
         })
 
@@ -210,15 +211,15 @@ class RpcHandler {
                 it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
                 it[ERROR_KEY] = errorType.toMap(data)
                 it[ID_KEY] = id
-            }.let { JsonParser.toJson(it) }
+            }.let { JsonParser.gson.toJson(it) }
         }
 
-        fun createResponse(result: Any, id: Any): String {
+        fun createResponse(result: Any?, id: Any): String {
             return mutableMapOf<String, Any>().also {
                 it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
-                it[RESULT_KEY] = JsonParser.toJson(result)
+                it[RESULT_KEY] = JsonParser.gson.toJson(result)
                 it[ID_KEY] = id
-            }.let { JsonParser.toJson(it) }
+            }.let { JsonParser.gson.toJson(it) }
         }
 
     }

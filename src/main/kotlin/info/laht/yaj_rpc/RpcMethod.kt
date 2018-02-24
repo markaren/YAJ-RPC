@@ -24,12 +24,9 @@
 
 package info.laht.yaj_rpc
 
-import java.lang.annotation.Retention
-import java.lang.annotation.RetentionPolicy
-
 /**
  * @author Lars Ivar Hatledal
  */
-@Retention(RetentionPolicy.RUNTIME)
+@kotlin.annotation.Retention(value = AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
 annotation class RpcMethod
