@@ -4,6 +4,9 @@ import com.google.gson.*
 import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.reflect.Type
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 sealed class RpcParams {
 
     abstract val paramCount: Int
@@ -23,6 +26,9 @@ sealed class RpcParams {
 
 }
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 object RpcNoParams: RpcParams() {
 
     override val paramCount: Int
@@ -30,6 +36,9 @@ object RpcNoParams: RpcParams() {
 
 }
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 class RpcListParams<out E>(
         val value: List<E>
 ): RpcParams() {
@@ -45,6 +54,9 @@ class RpcListParams<out E>(
 
 }
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 class RpcMapParams<out E>(
         val value: Map<String, E>
 ): RpcParams() {
@@ -58,6 +70,9 @@ class RpcMapParams<out E>(
 
 }
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 class RpcParamsTypeAdapter : JsonDeserializer<RpcParams>, JsonSerializer<RpcParams> {
 
     override fun serialize(src: RpcParams, typeOfSrc: Type, context: JsonSerializationContext): JsonElement? {

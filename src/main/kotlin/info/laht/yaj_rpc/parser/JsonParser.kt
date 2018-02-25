@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory
  *
  * @author Lars Ivar Hatledal
  */
-object JsonParser {
+internal object JsonParser {
 
     private val LOG: Logger = LoggerFactory.getLogger(JsonParser::class.java)
 
@@ -63,27 +63,5 @@ object JsonParser {
         builder.registerTypeAdapter(type, typeAdapter)
         changed = true
     }
-
-//    fun toJson(`object`: Any?): String {
-//        return getGson().toJson(`object`)
-//    }
-//
-//    fun <T> fromJson(json: String, clazz: Class<T>): T {
-//        return getGson().fromJson(json, clazz)
-//    }
-
-//    fun parseRequest(json: String): RpcRequestImpl {
-//        return getGson().fromJson(json, RpcRequestImpl::class.java)
-//    }
-//
-//    fun parseResponse(json: String): RpcResponse? {
-//        try {
-//            return getGson().fromJson(json, RpcResponse::class.java)
-//        } catch (ex: IllegalStateException) {
-//            LOG.error("Failed to parse response from: {}", json, ex)
-//        }
-//
-//        return null
-//    }
 
 }

@@ -27,6 +27,9 @@ package info.laht.yaj_rpc
 import com.google.gson.annotations.SerializedName
 import info.laht.yaj_rpc.parser.JsonParser
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 interface RpcRequest {
     val id: Any
     val version: String?
@@ -52,7 +55,7 @@ interface RpcRequest {
 }
 
 /**
- * @author Lars Ivar Hatledal laht@ntnu.no.
+ * @author Lars Ivar Hatledal
  */
 class RpcRequestImpl internal constructor(): RpcRequest {
 

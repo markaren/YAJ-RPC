@@ -32,6 +32,9 @@ import org.slf4j.LoggerFactory
 
 typealias Converter<E> = (JsonElement) -> E
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 class RpcHandler {
 
     private val services = mutableMapOf<String, RpcService>()

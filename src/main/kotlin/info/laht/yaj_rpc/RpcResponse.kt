@@ -34,7 +34,6 @@ interface RpcResponse {
 
     val id: Any
     val version: String?
-
     val error: RpcError?
 
     fun <T> getResult(clazz: Class<T>): T?
@@ -62,7 +61,6 @@ class RpcResponseImpl internal constructor(): RpcResponse {
     override val error: RpcError? = null
     private val result: String? = null
 
-
     val isVoid: Boolean
         get() = hasResult && result == null
 
@@ -78,12 +76,6 @@ class RpcResponseImpl internal constructor(): RpcResponse {
             Gson().fromJson(result, clazz)
         } else null
     }
-
-//    fun <T> getResult(clazz: Type): T {
-//        return if (hasResult) {
-//            Gson().fromJson<T>(result, clazz)
-//        } else throw IllegalStateException("Response has no result!")
-//    }
 
     override fun toString(): String {
         return "JsonRPCResponse{" + "jsonrpc=" + version + ", id=" + id + ", response=" + (if (hasError) error else result) + '}'.toString()
