@@ -24,7 +24,6 @@
 
 package info.laht.yaj_rpc
 
-import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.reflect.Method
@@ -35,14 +34,14 @@ typealias Converter<E> = (JsonElement) -> E
 
 class RpcHandler {
 
-    private val services = mutableMapOf<String, AbstractRpcService>()
+    private val services = mutableMapOf<String, RpcService>()
     private val converters = mutableMapOf<Class<*>, Converter<*>>()
 
-    fun addService(service: AbstractRpcService) {
+    fun addService(service: RpcService) {
         services[service.name] = service
     }
 
-    fun removeService(service: AbstractRpcService) {
+    fun removeService(service: RpcService) {
         services.remove(service.name)
     }
 
@@ -52,7 +51,7 @@ class RpcHandler {
 
     fun getOpenMessage(): String {
         return services.entries.associate {
-            it.key to it.value.getCallDescription()
+            it.key to RpcService.getCallDescription(it.value)
         }.let { JsonParser.gson.toJson(it) }
     }
 
@@ -97,7 +96,7 @@ class RpcHandler {
         val service = services[serviceName]!!
         val methodName = split[1]
         val paramCount = req.params.paramCount
-        val method = service.getExposedMethod(methodName, paramCount)
+        val method = RpcService.getExposedMethod(service, methodName, paramCount)
         if (method == null) {
             val msg = "no such method '$methodName' in service '$serviceName' that takes $paramCount params"
             LOG.warn(msg)
@@ -110,10 +109,9 @@ class RpcHandler {
             is RpcMapParams<*> -> handleMapParams(service, method, params.value as Map<String, JsonElement>, id, req.isNotification)
         }
 
-
     }
 
-    private fun handleNoParams(service: AbstractRpcService, method: Method, id: Any, isNotification: Boolean): String? {
+    private fun handleNoParams(service: RpcService, method: Method, id: Any, isNotification: Boolean): String? {
         if (method.parameterCount > 0) {
             return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND)
         }
@@ -127,7 +125,7 @@ class RpcHandler {
 
     }
 
-    private fun handleListParams(service: AbstractRpcService, method: Method, params: List<JsonElement>, id: Any, isNotification: Boolean): String? {
+    private fun handleListParams(service: RpcService, method: Method, params: List<JsonElement>, id: Any, isNotification: Boolean): String? {
 
         if (params.size != method.parameterCount) {
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, "params.length != method.getParameterCount()")
@@ -157,7 +155,7 @@ class RpcHandler {
 
     }
 
-    private fun handleMapParams(service: AbstractRpcService, method: Method, params: Map<String, JsonElement>, id: Any, isNotification: Boolean): String? {
+    private fun handleMapParams(service: RpcService, method: Method, params: Map<String, JsonElement>, id: Any, isNotification: Boolean): String? {
 
         if (method.parameterCount != params.size) {
             val msg = "Number of method parameters and params does not match '$method'"
@@ -171,7 +169,7 @@ class RpcHandler {
             LOG.error(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, msg)
         }
-        val args = MutableList<JsonElement>(params.size, {i -> getValueByIndex(collect[i], params)})
+        val args = MutableList(params.size, {i -> getValueByIndex(collect[i], params)})
         return handleListParams(service, method, args, id, isNotification)
     }
 

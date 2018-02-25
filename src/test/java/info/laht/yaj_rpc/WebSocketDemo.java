@@ -1,35 +1,4 @@
-# YAJ-RPC
-Yet Another JSON RPC (YAJ-RPC) is a JSON RPC 2.0 implementation for JVM languages written in Kotlin.
-
-Client and server for WebSockets are included, but the RPC implementations itself is totally independent from any networking logic.
-
-RPC methods are regular methods annotated with @RpcMethod, like so:
-
-###Example service
-```java
-
-import info.laht.yaj_rpc.RpcMethod;
-import info.laht.yaj_rpc.AbstractRpcService;
-
-class MyService implements RpcService {
-    
-    @Override
-    public String getName() {
-        return MyService.class.getSimpleName();
-    }
-    
-    @RpcMethod
-    public String greet(String input)  {
-        return "Hello " + input + '!';
-    }
-    
-}
-
-```
-
-In order to invoke the above 
-
-```java
+package info.laht.yaj_rpc;
 
 import info.laht.yaj_rpc.RpcHandler;
 import info.laht.yaj_rpc.ws.RpcWebSocketClient;
@@ -38,9 +7,9 @@ import info.laht.yaj_rpc.RpcParams;
 import info.laht.yaj_rpc.RpcResponse;
 
 class WebSocketDemo {
-    
+
     public static void main(String[] args) {
-        
+
         RpcHandler handler = new RpcHandler();
         handler.addService(new SampleService());
 
@@ -58,9 +27,7 @@ class WebSocketDemo {
 
         client.close();
         server.close();
-        
-    }
-    
-}
 
-```
+    }
+
+}

@@ -2,6 +2,7 @@ package info.laht.yaj_rpc.ws
 
 import info.laht.yaj_rpc.RpcHandler
 import info.laht.yaj_rpc.RpcListParams
+import info.laht.yaj_rpc.RpcParams
 import info.laht.yaj_rpc.SampleService
 import org.junit.After
 import org.junit.Before
@@ -12,7 +13,7 @@ import java.util.concurrent.TimeUnit
 class TestWs {
 
     lateinit var server: RpcWebSocketServer
-    lateinit var client: AsyncRpcWebSocketClient
+    lateinit var client: RpcWebSocketClient
 
     @Before
     fun setup() {
@@ -23,10 +24,13 @@ class TestWs {
 
         val port = 9777
 
-        server = RpcWebSocketServer(port, handler)
-        server.start()
+        server = RpcWebSocketServer(port, handler).also {
+            it.start()
+        }
 
-        client = AsyncRpcWebSocketClient("localhost", port)
+        client = RpcWebSocketClient("localhost", port).also {
+            it.connect()
+        }
 
 
     }
@@ -42,16 +46,14 @@ class TestWs {
 
         if (false) {
             val latch = CountDownLatch(1)
-            client.writeAsync("SampleService.helloWorld", RpcListParams("per"), {
-                println(it)
+            client.writeAsync("SampleService.greet", RpcParams.listParams("per"), {
+                println(it.getResult(String::class.java))
                 latch.countDown()
             })
             latch.await(1000, TimeUnit.MILLISECONDS)
         } else {
 
-            client.write("SampleService.helloWorld", RpcListParams("per"), {
-                println(it)
-            })
+            println(client.write("SampleService.greet", RpcListParams("per")).getResult(String::class.java))
 
         }
 

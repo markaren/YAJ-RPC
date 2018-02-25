@@ -26,8 +26,6 @@ package info.laht.yaj_rpc
 
 import com.google.gson.annotations.SerializedName
 import info.laht.yaj_rpc.parser.JsonParser
-import java.util.*
-import java.util.concurrent.atomic.AtomicInteger
 
 interface RpcRequest {
     val id: Any
@@ -53,52 +51,6 @@ interface RpcRequest {
 
 }
 
-//
-//object RpcRequestBuilder {
-//
-//    fun message(methodName: String, params: List<Any>? = null) : RpcRequest {
-//        val rpcParams = params?.let { RpcListParams(params) } ?: RpcNoParams
-//        return build(methodName, rpcParams, false)
-//    }
-//
-//    fun notification(methodName: String, params: List<Any>) : RpcRequest {
-//        return build(methodName, RpcListParams(params), true)
-//    }
-//
-//    fun message(methodName: String, params: Map<String, Any>? = null) : RpcRequest {
-//        val rpcParams = params?.let { RpcMapParams(params) } ?: RpcNoParams
-//        return build(methodName, rpcParams, false)
-//    }
-//
-//    fun notification(methodName: String, params: Map<String, Any>? = null) : RpcRequest {
-//        val rpcParams = params?.let { RpcMapParams(params) } ?: RpcNoParams
-//        return build(methodName, rpcParams, true)
-//    }
-//
-//    private fun build(methodName: String, params: RpcParams, isNotification: Boolean): RpcRequest {
-//        return RpcRequestImpl1(methodName, params).apply {
-//            if (!isNotification) {
-//                id = UUID.randomUUID().toString()
-//            }
-//        }
-//    }
-//
-//}
-//
-//
-//data class RpcRequestImpl1(
-//        @SerializedName(value = "method")
-//        override val methodName: String,
-//        override val params: RpcParams
-//): RpcRequest {
-//
-//    override var id: Any = NO_ID
-//
-//    @SerializedName(value = "jsonrpc")
-//    override val version: String = JSON_RPC_VERSION
-//
-//}
-
 /**
  * @author Lars Ivar Hatledal laht@ntnu.no.
  */
@@ -123,7 +75,7 @@ class RpcRequestImpl internal constructor(): RpcRequest {
 
             version?.also { add("jsonrpc=$it") }
             methodName?.also { add("method=$it") }
-            params?.also { add("params=$it") }
+            add("params=$params")
             if (id !== NO_ID) {
                 add("id=$id")
             }

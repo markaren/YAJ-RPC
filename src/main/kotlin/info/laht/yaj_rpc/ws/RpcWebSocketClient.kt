@@ -14,7 +14,7 @@ import java.util.concurrent.CountDownLatch
 
 typealias RpcCallback = (RpcResponse) -> Unit
 
-class AsyncRpcWebSocketClient(
+class RpcWebSocketClient(
         private val host: String,
         private val port: Int
 ): AutoCloseable {
@@ -22,19 +22,27 @@ class AsyncRpcWebSocketClient(
     private val uri = URI("ws://$host:$port")
     private val callbacks = mutableMapOf<String, RpcCallback>()
 
-    private val ws = WebSocketClientImpl().apply {
-        connectBlocking()
-    }
+    private var connectionInitiated = false
+    private val ws = WebSocketClientImpl()
 
-    override fun close() {
-        ws.closeBlocking()
-    }
+    fun connectAsync() = ws.connect().also { connectionInitiated = true }
+    fun connect() = ws.connectBlocking().also { connectionInitiated = true }
 
+    override fun close() = ws.closeBlocking()
+    fun closeAsync() = ws.close()
+
+
+    @JvmOverloads
     fun notify(methodName: String, params: RpcParams = RpcNoParams) {
+        if (!connectionInitiated) throw IllegalStateException("Forgot to call connect?")
+
         ws.send(RpcRequest(methodName, params).let { it.toJson() })
     }
 
+    @JvmOverloads
     fun writeAsync(methodName: String, params: RpcParams = RpcNoParams, callback: RpcCallback) {
+        if (!connectionInitiated) throw IllegalStateException("Forgot to call connect?")
+
         val request = RpcRequest(methodName, params).apply {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = callback
@@ -42,20 +50,23 @@ class AsyncRpcWebSocketClient(
         ws.send(request)
     }
 
-    fun write(methodName: String, params: RpcParams = RpcNoParams, callback: RpcCallback) {
+    @JvmOverloads
+    fun write(methodName: String, params: RpcParams = RpcNoParams): RpcResponse {
+        if (!connectionInitiated) throw IllegalStateException("Forgot to call connect?")
+
+        var response: RpcResponse? = null
         val latch = CountDownLatch(1)
         val request = RpcRequest(methodName, params).apply {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = {
-                callback.invoke(it)
+                response = it
                 latch.countDown()
             }
         }.let { it.toJson() }
         ws.send(request)
         latch.await()
+        return response!!
     }
-
-    //fun writeAsync(methodName: String, params: RpcParams = RpcNoParams) : RpcResponse {
 
     inner class WebSocketClientImpl: WebSocketClient(uri) {
 
@@ -64,19 +75,16 @@ class AsyncRpcWebSocketClient(
         }
 
         override fun onMessage(message: String) {
-            RpcResponse.fromJson(message)?.also { response ->
-                if (response.error != null) {
-                    LOG.warn("RPC invocation returned error: ${response.error}")
-                } else {
-                    val id = response.id.toString()
-                    callbacks[id]?.also { callback ->
-                        callback.invoke(response)
-                    }
-                    callbacks.remove(id)
+            val response = RpcResponse.fromJson(message)
+            if (response.error != null) {
+                LOG.warn("RPC invocation returned error: ${response.error}")
+            } else {
+                val id = response.id.toString()
+                callbacks[id]?.also { callback ->
+                    callback.invoke(response)
                 }
-
+                callbacks.remove(id)
             }
-
         }
 
         override fun onClose(code: Int, reason: String?, remote: Boolean) {
@@ -105,7 +113,7 @@ class AsyncRpcWebSocketClient(
     }
 
     companion object {
-        val LOG: Logger = LoggerFactory.getLogger(AsyncRpcWebSocketClient::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(RpcWebSocketClient::class.java)
     }
 
 }

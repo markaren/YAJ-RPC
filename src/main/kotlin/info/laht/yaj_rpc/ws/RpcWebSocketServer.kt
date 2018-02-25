@@ -16,13 +16,8 @@ class RpcWebSocketServer(
 
     private val ws = WebSocketServerImpl()
 
-    fun start() {
-        ws.start()
-    }
-
-    fun stop() {
-        ws.stop()
-    }
+    fun start() = ws.start()
+    fun stop() = ws.stop()
 
     override fun close() = stop()
 
@@ -48,7 +43,7 @@ class RpcWebSocketServer(
 
 
 
-        override fun onError(conn: WebSocket, ex: Exception) {
+        override fun onError(conn: WebSocket?, ex: Exception) {
             LOG.error("WS error", ex)
         }
     }
