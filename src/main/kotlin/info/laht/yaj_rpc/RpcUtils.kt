@@ -40,8 +40,8 @@ fun indexOf(parameterName: String, method: Method): Int {
 }
 
 fun getValueByIndex(index: Int, map: Map<String, JsonElement>): JsonElement {
-    for ((index, value) in map.values.withIndex()) {
-        if (index == index) {
+    for ((i, value) in map.values.withIndex()) {
+        if (i == index) {
             return value
         }
     }
