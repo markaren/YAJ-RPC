@@ -22,9 +22,10 @@
  * THE SOFTWARE.
  */
 
-package info.laht.yaj_rpc.ws
+package info.laht.yaj_rpc.net.ws
 
 import info.laht.yaj_rpc.RpcHandler
+import info.laht.yaj_rpc.net.RpcServer
 import org.java_websocket.WebSocket
 import org.java_websocket.handshake.ClientHandshake
 import org.java_websocket.server.WebSocketServer
@@ -34,30 +35,36 @@ import java.lang.Exception
 import java.net.InetSocketAddress
 
 class RpcWebSocketServer(
-        val port: Int,
-        val handler: RpcHandler
-): AutoCloseable {
+        private val handler: RpcHandler
+): RpcServer {
 
-    private val ws = WebSocketServerImpl()
+    private var ws: WebSocketServerImpl? = null
 
-    fun start() = ws.start()
-    fun stop() = ws.stop()
+    override fun start(port: Int) {
+        if (ws == null) {
+            ws = WebSocketServerImpl(port).also { it.start() }
+        }
+    }
 
-    override fun close() = stop()
+    override fun stop() {
+        ws?.stop()
+    }
 
-    inner class WebSocketServerImpl: WebSocketServer(InetSocketAddress(port)) {
+    inner class WebSocketServerImpl(
+            port: Int
+    ): WebSocketServer(InetSocketAddress(port)) {
 
         override fun onStart() {
             LOG.debug("onStart")
         }
 
         override fun onOpen(conn: WebSocket, handshake: ClientHandshake?) {
-            LOG.info("Connection to server established")
+            LOG.info("Client with address ${conn.remoteSocketAddress} connected")
             conn.send(handler.getOpenMessage())
         }
 
         override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) {
-            LOG.info("Client disconnected")
+            LOG.info("Client with address ${conn.remoteSocketAddress} disconnected")
         }
 
         override fun onMessage(conn: WebSocket, message: String) {

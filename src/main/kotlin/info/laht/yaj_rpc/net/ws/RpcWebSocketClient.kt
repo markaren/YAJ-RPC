@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package info.laht.yaj_rpc.ws
+package info.laht.yaj_rpc.net.ws
 
 import com.google.gson.annotations.SerializedName
 import info.laht.yaj_rpc.*

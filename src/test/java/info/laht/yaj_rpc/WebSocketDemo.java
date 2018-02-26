@@ -1,21 +1,20 @@
 package info.laht.yaj_rpc;
 
-import info.laht.yaj_rpc.RpcHandler;
-import info.laht.yaj_rpc.ws.RpcWebSocketClient;
-import info.laht.yaj_rpc.ws.RpcWebSocketServer;
-import info.laht.yaj_rpc.RpcParams;
-import info.laht.yaj_rpc.RpcResponse;
+import info.laht.yaj_rpc.net.ws.RpcWebSocketClient;
+import info.laht.yaj_rpc.net.ws.RpcWebSocketServer;
 
 class WebSocketDemo {
 
     public static void main(String[] args) {
 
-        RpcHandler handler = new RpcHandler();
-        handler.addService(new SampleService());
+        RpcHandler handler = new RpcHandler(
+                new SampleService()
+        );
+
 
         int port = 9777;
-        RpcWebSocketServer server = new RpcWebSocketServer(port, handler);
-        server.start();
+        RpcWebSocketServer server = new RpcWebSocketServer(handler);
+        server.start(port);
 
         RpcWebSocketClient client = new RpcWebSocketClient("localhost", port);
         client.connect();

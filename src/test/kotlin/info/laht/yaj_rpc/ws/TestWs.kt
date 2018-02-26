@@ -4,6 +4,8 @@ import info.laht.yaj_rpc.RpcHandler
 import info.laht.yaj_rpc.RpcListParams
 import info.laht.yaj_rpc.RpcParams
 import info.laht.yaj_rpc.SampleService
+import info.laht.yaj_rpc.net.ws.RpcWebSocketClient
+import info.laht.yaj_rpc.net.ws.RpcWebSocketServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -18,20 +20,16 @@ class TestWs {
     @Before
     fun setup() {
 
-        val handler = RpcHandler().apply {
-            addService(SampleService())
-        }
+        val handler = RpcHandler(SampleService())
 
         val port = 9777
-
-        server = RpcWebSocketServer(port, handler).also {
-            it.start()
+        server = RpcWebSocketServer( handler).also {
+            it.start(port)
         }
 
         client = RpcWebSocketClient("localhost", port).also {
             it.connect()
         }
-
 
     }
 
