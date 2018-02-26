@@ -22,46 +22,15 @@
  * THE SOFTWARE.
  */
 
-package info.laht.yaj_rpc.parser
-
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import info.laht.yaj_rpc.*
-import java.lang.reflect.Type
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-
-/**
- *
- * @author Lars Ivar Hatledal
- */
-internal object JsonParser {
-
-    private val LOG: Logger = LoggerFactory.getLogger(JsonParser::class.java)
-
-    private var changed = false
-    private var _gson: Gson? = null
-
-    private val builder by lazy {
-        GsonBuilder()
-                .serializeNulls()
-                .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
-                .setPrettyPrinting()
-    }
+package info.laht.yaj_rpc.net
 
 
-    val gson: Gson
-    get() {
-        if (changed || _gson == null) {
-            changed = false
-            _gson = builder.create()
-        }
-        return _gson!!
-    }
+interface RpcServer: AutoCloseable {
 
-    fun registerTypeAdapter(type: Type, typeAdapter: Any) {
-        builder.registerTypeAdapter(type, typeAdapter)
-        changed = true
-    }
+    fun start(port: Int)
+
+    fun stop()
+
+    override fun close() = stop()
 
 }

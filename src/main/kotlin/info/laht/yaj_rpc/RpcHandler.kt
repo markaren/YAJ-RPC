@@ -30,27 +30,15 @@ import java.lang.reflect.Method
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-typealias Converter<E> = (JsonElement) -> E
-
 /**
  * @author Lars Ivar Hatledal
  */
-class RpcHandler {
+class RpcHandler private constructor(
+        private val services: Map<String, RpcService>
+) {
 
-    private val services = mutableMapOf<String, RpcService>()
-    private val converters = mutableMapOf<Class<*>, Converter<*>>()
-
-    fun addService(service: RpcService) {
-        services[service.name] = service
-    }
-
-    fun removeService(service: RpcService) {
-        services.remove(service.name)
-    }
-
-    fun addConverter(t: Class<*>, converter: Converter<*>) {
-        converters[t] = converter
-    }
+    constructor(vararg services:RpcService): this(services.associateBy { it.name })
+    constructor(services: List<RpcService>): this(services.associateBy { it.name })
 
     fun getOpenMessage(): String {
         return services.entries.associate {
@@ -186,7 +174,6 @@ class RpcHandler {
             val arg = types[i]
             val param = params[i]
             when {
-                converters.containsKey(arg) -> converters[arg]!!.invoke(param)!!
                 arg == Boolean::class.java || arg == Boolean::class.javaPrimitiveType -> param.asBoolean
                 arg == Long::class.java || arg == Long::class.javaPrimitiveType -> param.asLong
                 arg == Int::class.java || arg == Int::class.javaPrimitiveType -> param.asInt

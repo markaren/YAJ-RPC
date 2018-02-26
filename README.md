@@ -40,8 +40,8 @@ In order to invoke the above
 ```java
 
 import info.laht.yaj_rpc.RpcHandler;
-import info.laht.yaj_rpc.ws.RpcWebSocketClient;
-import info.laht.yaj_rpc.ws.RpcWebSocketServer;
+import info.laht.yaj_rpc.net.ws.RpcWebSocketClient;
+import info.laht.yaj_rpc.net.ws.RpcWebSocketServer;
 import info.laht.yaj_rpc.RpcParams;
 import info.laht.yaj_rpc.RpcResponse;
 
