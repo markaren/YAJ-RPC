@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/markaren/YAJ-RPC/issues)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.laht.YAJ-RPC/badge.svg)](https://mvnrepository.com/artifact/info.laht.YAJ-RPC)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.laht/yaj-rpc/badge.svg)](https://mvnrepository.com/artifact/info.laht/yaj-rpc)
 
 
 
