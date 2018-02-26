@@ -13,8 +13,7 @@ class TestService {
     @Test
     fun testService() {
 
-        val handler = RpcHandler()
-        handler.addService(SampleService())
+        val handler = RpcHandler(SampleService())
 
         println(handler.getOpenMessage())
 
