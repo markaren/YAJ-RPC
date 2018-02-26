@@ -17,7 +17,6 @@ class WebSocketDemo {
         server.start(port);
 
         RpcWebSocketClient client = new RpcWebSocketClient("localhost", port);
-        client.connect();
 
         RpcParams params = RpcParams.listParams("Clint Eastwood");
         RpcResponse response = client.write("SampleService.greet", params);
