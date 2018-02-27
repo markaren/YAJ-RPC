@@ -38,16 +38,25 @@ class RpcWebSocketServer(
         private val handler: RpcHandler
 ): RpcServer {
 
+    private val clients = mutableSetOf<WebSocket>()
     private var ws: WebSocketServerImpl? = null
 
     override fun start(port: Int) {
         if (ws == null) {
-            ws = WebSocketServerImpl(port).also { it.start() }
+            ws = WebSocketServerImpl(port).also {
+                it.start()
+                LOG.info("RpcWebSocketServer listening for connections on port: $port")
+            }
+        } else {
+            LOG.warn("RpcWebSocketServer has already been started!")
         }
     }
 
     override fun stop() {
-        ws?.stop()
+        ws?.also {
+            clients.forEach { it.close() }
+            it.stop()
+        }
     }
 
     inner class WebSocketServerImpl(
@@ -61,10 +70,16 @@ class RpcWebSocketServer(
         override fun onOpen(conn: WebSocket, handshake: ClientHandshake?) {
             LOG.info("Client with address ${conn.remoteSocketAddress} connected")
             conn.send(handler.getOpenMessage())
+            synchronized(clients) {
+                clients.add(conn)
+            }
         }
 
         override fun onClose(conn: WebSocket, code: Int, reason: String?, remote: Boolean) {
             LOG.info("Client with address ${conn.remoteSocketAddress} disconnected")
+            synchronized(clients) {
+                clients.remove(conn)
+            }
         }
 
         override fun onMessage(conn: WebSocket, message: String) {

@@ -22,52 +22,66 @@
  * THE SOFTWARE.
  */
 
-package info.laht.yaj_rpc.net.ws
+package info.laht.yaj_rpc.net.tcp
+
 
 import info.laht.yaj_rpc.net.AbstractRpcClient
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.lang.Exception
-import java.net.URI
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.net.Socket
+import java.io.IOException
+import java.nio.ByteBuffer
 
 
-class RpcWebSocketClient(
+class RpcTcpClient(
         host: String,
         port: Int
 ): AbstractRpcClient() {
 
-    private val uri = URI("ws://$host:$port")
-    private val ws = WebSocketClientImpl().also { it.connectBlocking() }
+    private val socket: Socket = Socket(host, port)
+    private val `in` = BufferedInputStream(socket.getInputStream())
+    private val out = BufferedOutputStream(socket.getOutputStream())
 
-    override fun close() = ws.closeBlocking()
+    fun start() {
+        Thread {
 
-    override fun write(msg: String) {
-        ws.send(msg)
+            val lenBuf = ByteArray(4)
+            try {
+                while (true) {
+
+                    `in`.read(lenBuf)
+                    var len = ByteBuffer.wrap(lenBuf).int
+
+                    val msg = ByteArray(len).also {
+                        `in`.read(it, 0, len)
+                    }.let { String(it) }
+
+                    messageReceived(msg)
+
+                }
+            } catch (ex: IOException) {
+                //suppress
+            }
+
+        }.start()
     }
 
-    inner class WebSocketClientImpl: WebSocketClient(uri) {
+    override fun close() {
+        socket.close()
+    }
 
-        override fun onOpen(handshakedata: ServerHandshake?) {
-            LOG.info("WS client connected")
-        }
-
-        override fun onMessage(message: String)
-                = messageReceived(message)
-
-        override fun onClose(code: Int, reason: String?, remote: Boolean) {
-            LOG.info("WS client closed connection..")
-        }
-
-        override fun onError(ex: Exception) {
-            LOG.error("WS error", ex)
-        }
-
+    override fun write(msg: String) {
+        val bytes = msg.toByteArray()
+        val len = bytes.size
+        out.write(ByteBuffer.allocate(4).putInt(len).array())
+        out.write(bytes)
+        out.flush()
     }
 
     private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(RpcWebSocketClient::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(RpcTcpClient::class.java)
     }
 
 }

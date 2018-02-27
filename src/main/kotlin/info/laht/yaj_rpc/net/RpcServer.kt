@@ -34,3 +34,4 @@ interface RpcServer: AutoCloseable {
     override fun close() = stop()
 
 }
+
