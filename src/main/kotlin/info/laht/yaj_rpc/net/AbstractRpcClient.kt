@@ -24,9 +24,7 @@
 
 package info.laht.yaj_rpc.net
 
-import com.google.gson.annotations.SerializedName
 import info.laht.yaj_rpc.*
-import info.laht.yaj_rpc.parser.JsonParser
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.*
@@ -41,12 +39,12 @@ abstract class AbstractRpcClient : AutoCloseable  {
 
     @JvmOverloads
     fun notify(methodName: String, params: RpcParams = RpcParams.noParams()) {
-        write(RpcRequest(methodName, params).let { it.toJson() })
+        write(RpcRequestOut(methodName, params).let { it.toJson() })
     }
 
     @JvmOverloads
     fun writeAsync(methodName: String, params: RpcParams = RpcNoParams, callback: RpcCallback) {
-        val request = RpcRequest(methodName, params).apply {
+        val request = RpcRequestOut(methodName, params).apply {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = callback
         }.let { it.toJson() }
@@ -58,7 +56,7 @@ abstract class AbstractRpcClient : AutoCloseable  {
 
         var response: RpcResponse? = null
         val latch = CountDownLatch(1)
-        val request = RpcRequest(methodName, params).apply {
+        val request = RpcRequestOut(methodName, params).apply {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = {
                 response = it
@@ -84,23 +82,6 @@ abstract class AbstractRpcClient : AutoCloseable  {
             }
             callbacks.remove(id)
         }
-    }
-
-    inner class RpcRequest(
-            @SerializedName("method")
-            val methodName: String,
-            val params: RpcParams = RpcNoParams
-    ) {
-
-        var id = NO_ID
-
-        @SerializedName("jsonrpc")
-        var version = JSON_RPC_VERSION
-
-        fun toJson(): String {
-            return JsonParser.gson.toJson(this)
-        }
-
     }
 
     private companion object {

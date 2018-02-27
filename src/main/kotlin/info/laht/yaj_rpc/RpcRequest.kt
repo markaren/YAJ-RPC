@@ -43,13 +43,26 @@ interface RpcRequest {
     companion object {
 
         fun fromJson(json: String): RpcRequest {
-            return JsonParser.gson.fromJson(json, RpcRequestImpl::class.java)
+            return JsonParser.gson.fromJson(json, RpcRequestIn::class.java)
         }
 
-        fun toJson(request: RpcRequest): String {
-            return JsonParser.gson.toJson(request)
-        }
+    }
 
+}
+
+class RpcRequestOut(
+        @SerializedName("method")
+        val methodName: String,
+        val params: RpcParams = RpcNoParams
+) {
+
+    var id = NO_ID
+
+    @SerializedName("jsonrpc")
+    var version = JSON_RPC_VERSION
+
+    fun toJson(): String {
+        return JsonParser.gson.toJson(this)
     }
 
 }
@@ -57,7 +70,7 @@ interface RpcRequest {
 /**
  * @author Lars Ivar Hatledal
  */
-class RpcRequestImpl internal constructor(): RpcRequest {
+class RpcRequestIn internal constructor(): RpcRequest {
 
     override val id = NO_ID
 
