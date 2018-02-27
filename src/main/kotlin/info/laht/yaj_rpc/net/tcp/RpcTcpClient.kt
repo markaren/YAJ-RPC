@@ -35,7 +35,7 @@ import java.io.IOException
 import java.nio.ByteBuffer
 
 
-class RpcTcpClient(
+open class RpcTcpClient(
         host: String,
         port: Int
 ): AbstractRpcClient() {
@@ -53,7 +53,6 @@ class RpcTcpClient(
 
                     `in`.read(lenBuf)
                     var len = ByteBuffer.wrap(lenBuf).int
-
                     val msg = ByteArray(len).also {
                         `in`.read(it, 0, len)
                     }.let { String(it) }
@@ -68,9 +67,7 @@ class RpcTcpClient(
         }.start()
     }
 
-    override fun close() {
-        socket.close()
-    }
+    override fun close() =  socket.close()
 
     override fun write(msg: String) {
         val bytes = msg.toByteArray()

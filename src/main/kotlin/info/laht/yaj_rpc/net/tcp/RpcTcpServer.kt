@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 
 
-class RpcTcpServer(
+open class RpcTcpServer(
         val handler: RpcHandler
 ): RpcServer {
 
@@ -49,6 +49,7 @@ class RpcTcpServer(
     override fun start(port: Int) {
         if (server == null) {
             server = ServerSocket(port)
+            LOG.info("RpcTcpServer listening for connections on port: $port")
             Thread({
                 while(!stop) {
                     try {
@@ -61,13 +62,15 @@ class RpcTcpServer(
                     }
                 }
             }).start()
+        } else {
+            LOG.warn("RpcTcpServer has already been started!")
         }
     }
 
     override fun stop() {
         stop = true
         server?.close()
-        LOG.debug("TCP server closed")
+        LOG.debug("RpcTcpServer server stopped!")
     }
 
     inner class ClientHandler(

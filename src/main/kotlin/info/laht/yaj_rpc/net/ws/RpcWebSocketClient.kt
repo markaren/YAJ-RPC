@@ -33,23 +33,25 @@ import java.lang.Exception
 import java.net.URI
 
 
-class RpcWebSocketClient(
+open class RpcWebSocketClient(
         host: String,
         port: Int
 ): AbstractRpcClient() {
 
     private val uri = URI("ws://$host:$port")
-    private val ws = WebSocketClientImpl().also { it.connectBlocking() }
+    private val ws = WebSocketClientImpl()
+
+    init {
+        ws.connectBlocking()
+    }
 
     override fun close() = ws.closeBlocking()
 
-    override fun write(msg: String) {
-        ws.send(msg)
-    }
+    override fun write(msg: String) = ws.send(msg)
 
     inner class WebSocketClientImpl: WebSocketClient(uri) {
 
-        override fun onOpen(handshakedata: ServerHandshake?) {
+        override fun onOpen(handshake: ServerHandshake?) {
             LOG.info("WS client connected")
         }
 
