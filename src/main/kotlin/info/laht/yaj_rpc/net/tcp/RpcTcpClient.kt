@@ -72,8 +72,8 @@ class RpcTcpClient(
         socket.close()
     }
 
-    override fun write(message: String) {
-        val bytes = message.toByteArray()
+    override fun write(msg: String) {
+        val bytes = msg.toByteArray()
         val len = bytes.size
         out.write(ByteBuffer.allocate(4).putInt(len).array())
         out.write(bytes)

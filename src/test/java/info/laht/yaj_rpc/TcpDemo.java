@@ -2,10 +2,10 @@ package info.laht.yaj_rpc;
 
 import info.laht.yaj_rpc.net.AbstractRpcClient;
 import info.laht.yaj_rpc.net.RpcServer;
-import info.laht.yaj_rpc.net.ws.RpcWebSocketClient;
-import info.laht.yaj_rpc.net.ws.RpcWebSocketServer;
+import info.laht.yaj_rpc.net.tcp.RpcTcpClient;
+import info.laht.yaj_rpc.net.tcp.RpcTcpServer;
 
-class WebSocketDemo {
+public class TcpDemo {
 
     public static void main(String[] args) throws Exception {
 
@@ -14,10 +14,10 @@ class WebSocketDemo {
         );
 
         int port = 9777;
-        RpcServer server = new RpcWebSocketServer(handler);
+        RpcServer server = new RpcTcpServer(handler);
         server.start(port);
 
-        AbstractRpcClient client = new RpcWebSocketClient("localhost", port);
+        AbstractRpcClient client = new RpcTcpClient("localhost", port);
 
         RpcParams params = RpcParams.listParams("Clint Eastwood");
         RpcResponse response = client.write("SampleService.greet", params);
