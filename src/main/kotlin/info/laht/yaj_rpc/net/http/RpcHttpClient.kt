@@ -5,7 +5,7 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
+import java.nio.charset.Charset
 
 
 class RpcHttpClient(
@@ -13,16 +13,20 @@ class RpcHttpClient(
          port: Int
 ): AbstractRpcClient() {
 
-    private val baseUrl = "http://$host:$port/jsonrpc?"
+    private val url = "http://$host:$port/jsonrpc?"
 
     override fun write(msg: String): String {
 
-        val urlFriendlyString = URLEncoder.encode(msg.replace("\\s".toRegex(), ""), "UTF-8")
-        val url = "$baseUrl$urlFriendlyString"
-
-        val con = URL(url).openConnection() as HttpURLConnection
-        con.setRequestProperty("Content-Type", "application/json-rpc")
-        con.requestMethod = "POST"
+        val con = (URL(url).openConnection() as HttpURLConnection).apply {
+            setRequestProperty("Content-Type", "application/json-rpc")
+            requestMethod = "POST"
+            doOutput = true
+            outputStream.use {
+                it.write(msg.toByteArray(Charset.forName("UTF-8")))
+                it.flush()
+            }
+            connect()
+        }
 
         return StringBuilder().apply {
             BufferedReader(InputStreamReader(con.inputStream)).use {
