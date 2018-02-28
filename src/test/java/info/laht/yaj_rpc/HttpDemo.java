@@ -1,13 +1,11 @@
 package info.laht.yaj_rpc;
 
-import info.laht.yaj_rpc.net.AbstractAsyncRpcClient;
 import info.laht.yaj_rpc.net.AbstractRpcClient;
 import info.laht.yaj_rpc.net.RpcServer;
 import info.laht.yaj_rpc.net.http.RpcHttpClient;
 import info.laht.yaj_rpc.net.http.RpcHttpServer;
 
 public class HttpDemo {
-
 
     public static void main(String[] args) throws Exception {
 
