@@ -39,7 +39,7 @@ abstract class AbstractRpcClient : AutoCloseable  {
 
     @JvmOverloads
     fun notify(methodName: String, params: RpcParams = RpcParams.noParams()) {
-        write(RpcRequestOut(methodName, params).let { it.toJson() })
+        write(RpcRequestOut(methodName, params).let { it.toJson() }, true)
     }
 
     @JvmOverloads
@@ -48,7 +48,7 @@ abstract class AbstractRpcClient : AutoCloseable  {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = callback
         }.let { it.toJson() }
-        write(request)
+        write(request, false)
     }
 
     @JvmOverloads
@@ -63,13 +63,13 @@ abstract class AbstractRpcClient : AutoCloseable  {
                 latch.countDown()
             }
         }.let { it.toJson() }
-        write(request)
+        write(request, false)
         latch.await()
         return response!!
 
     }
 
-    protected abstract fun write(msg: String)
+    protected abstract fun write(msg: String, isNotification: Boolean)
 
     protected fun messageReceived(message: String) {
         val response = RpcResponse.fromJson(message)

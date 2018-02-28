@@ -11,6 +11,7 @@ import info.laht.yaj_rpc.net.ws.RpcWebSocketServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.net.ServerSocket
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -22,10 +23,8 @@ class TestWs {
     @Before
     fun setup() {
 
-        val handler = RpcHandler(SampleService())
-
-        val port = 9777
-        server = RpcWebSocketServer( handler).also {
+        val port = ServerSocket(0).use { it.localPort }
+        server = RpcWebSocketServer(RpcHandler(SampleService())).also {
             it.start(port)
         }
 

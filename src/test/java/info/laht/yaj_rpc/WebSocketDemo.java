@@ -5,15 +5,15 @@ import info.laht.yaj_rpc.net.RpcServer;
 import info.laht.yaj_rpc.net.ws.RpcWebSocketClient;
 import info.laht.yaj_rpc.net.ws.RpcWebSocketServer;
 
+import java.net.ServerSocket;
+
 class WebSocketDemo {
 
     public static void main(String[] args) throws Exception {
 
-        RpcHandler handler = new RpcHandler(
-                new SampleService()
-        );
+        RpcHandler handler = new RpcHandler(new SampleService());
 
-        int port = 9777;
+        int port = PortFinder.availablePort();
         RpcServer server = new RpcWebSocketServer(handler);
         server.start(port);
 

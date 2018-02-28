@@ -47,7 +47,7 @@ open class RpcWebSocketClient(
 
     override fun close() = ws.closeBlocking()
 
-    override fun write(msg: String) = ws.send(msg)
+    override fun write(msg: String, isNotification: Boolean) = ws.send(msg)
 
     inner class WebSocketClientImpl: WebSocketClient(uri) {
 

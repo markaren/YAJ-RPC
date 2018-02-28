@@ -11,6 +11,7 @@ import info.laht.yaj_rpc.net.tcp.RpcTcpServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.net.ServerSocket
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
@@ -22,7 +23,7 @@ class TestTcp {
     @Before
     fun setup() {
 
-        val port = 9777
+        val port = ServerSocket(0).use { it.localPort }
         server = RpcTcpServer(RpcHandler(SampleService())).also {
             it.start(port)
         }
