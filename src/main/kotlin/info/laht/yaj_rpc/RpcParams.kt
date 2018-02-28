@@ -15,10 +15,13 @@ sealed class RpcParams {
 
         @JvmStatic
         fun noParams() = RpcNoParams
+
         @JvmStatic
         fun listParams(value: List<Any>) = RpcListParams(value)
+
         @JvmStatic
         fun listParams(vararg value: Any) = RpcListParams(value.toList())
+
         @JvmStatic
         fun mapParams(value: Map<String, Any>) = RpcMapParams(value)
 

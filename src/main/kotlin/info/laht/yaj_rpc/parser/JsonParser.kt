@@ -46,7 +46,7 @@ internal object JsonParser {
         GsonBuilder()
                 .serializeNulls()
                 .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
-                .setPrettyPrinting()
+               // .setPrettyPrinting()
     }
 
 

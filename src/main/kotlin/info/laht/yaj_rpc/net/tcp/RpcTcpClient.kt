@@ -25,7 +25,7 @@
 package info.laht.yaj_rpc.net.tcp
 
 
-import info.laht.yaj_rpc.net.AbstractRpcClient
+import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.BufferedInputStream
@@ -38,13 +38,17 @@ import java.nio.ByteBuffer
 open class RpcTcpClient(
         host: String,
         port: Int
-): AbstractRpcClient() {
+): AbstractAsyncRpcClient() {
 
     private val socket: Socket = Socket(host, port)
     private val `in` = BufferedInputStream(socket.getInputStream())
     private val out = BufferedOutputStream(socket.getOutputStream())
 
-    fun start() {
+    init {
+        start()
+    }
+
+    private fun start() {
         Thread {
 
             val lenBuf = ByteArray(4)
@@ -67,12 +71,15 @@ open class RpcTcpClient(
         }.start()
     }
 
-    override fun close() =  socket.close()
+    override fun close() = socket.close()
 
-    override fun write(msg: String, isNotification: Boolean) {
+    override fun write(msg: String) {
+        println("write: $msg" )
         val bytes = msg.toByteArray()
-        val len = bytes.size
-        out.write(ByteBuffer.allocate(4).putInt(len).array())
+        val len = bytes.size.let {
+            ByteBuffer.allocate(4).putInt(it).array()
+        }
+        out.write(len)
         out.write(bytes)
         out.flush()
     }

@@ -29,6 +29,7 @@ class RpcHttpServer(
             t.requestURI.query?.also { query ->
 
                 val data = URLDecoder.decode(query, "UTF-8")
+                LOG.debug("Received: $data")
                 handler.handle(data)?.also { response ->
                     val bytes = response.toByteArray(Charset.forName("UTF-8"))
                     t.sendResponseHeaders(200, bytes.size.toLong())
@@ -36,8 +37,6 @@ class RpcHttpServer(
                         it.write(bytes)
                     }
                 } ?: noResponse(t)
-
-
 
             }
         }

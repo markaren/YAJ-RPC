@@ -37,6 +37,7 @@ import java.net.Socket
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 
 open class RpcTcpServer(
@@ -57,7 +58,7 @@ open class RpcTcpServer(
                         LOG.info("Client with address ${accept.remoteSocketAddress} connected!")
                         val handler = ClientHandler(accept)
                         Thread(handler).start()
-                    }catch (ex: IOException) {
+                    } catch (ex: IOException) {
 
                     }
                 }
@@ -81,15 +82,16 @@ open class RpcTcpServer(
         val out = BufferedOutputStream(socket.getOutputStream())
 
         override fun run() {
-            val lenBuf = ByteArray(4)
-            try {
-                while (!stop) {
-                    `in`.read(lenBuf)
-                    val len = ByteBuffer.wrap(lenBuf).int
 
+            try {
+                val lenBuf = ByteArray(4)
+                while (!stop) {
+
+                    `in`.read(lenBuf, 0, lenBuf.size)
+                    val len = ByteBuffer.wrap(lenBuf).int
                     val msg = ByteArray(len).also {
                         `in`.read(it, 0, len)
-                    }.let { String(it) }
+                    }.let { String(it).replace(0.toChar(), ' ').trim() }
 
                     if (msg.isNotEmpty()) {
                         handler.handle(msg)?.also {
@@ -105,9 +107,8 @@ open class RpcTcpServer(
 
         private fun write(data: String) {
             val bytes = data.toByteArray()
-            val len = bytes.size
-
-            out.write(ByteBuffer.allocate(4).putInt(len).array())
+            val len = bytes.size.let { (ByteBuffer.allocate(4).putInt(it).array()) }
+            out.write(len)
             out.write(bytes)
             out.flush()
         }

@@ -24,11 +24,20 @@
 
 package info.laht.yaj_rpc.net
 
-
+/**
+ * @author Lars Ivar Hatledal
+ */
 interface RpcServer: AutoCloseable {
 
+    /**
+     * Start the server using the provided port number
+     * @param port the port number to use
+     */
     fun start(port: Int)
 
+    /**
+     * Stop the server
+     */
     fun stop()
 
     override fun close() = stop()

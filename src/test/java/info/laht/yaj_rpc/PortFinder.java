@@ -3,7 +3,7 @@ package info.laht.yaj_rpc;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-public class PortFinder {
+class PortFinder {
 
     static int availablePort() throws IOException {
 
