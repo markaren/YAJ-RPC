@@ -24,7 +24,7 @@
 
 package info.laht.yaj_rpc.net.ws
 
-import info.laht.yaj_rpc.net.AbstractRpcClient
+import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
@@ -33,23 +33,25 @@ import java.lang.Exception
 import java.net.URI
 
 
-class RpcWebSocketClient(
+open class RpcWebSocketClient(
         host: String,
         port: Int
-): AbstractRpcClient() {
+): AbstractAsyncRpcClient() {
 
     private val uri = URI("ws://$host:$port")
-    private val ws = WebSocketClientImpl().also { it.connectBlocking() }
+    private val ws = WebSocketClientImpl()
+
+    init {
+        ws.connectBlocking()
+    }
 
     override fun close() = ws.closeBlocking()
 
-    override fun write(msg: String) {
-        ws.send(msg)
-    }
+    override fun write(msg: String) = ws.send(msg)
 
     inner class WebSocketClientImpl: WebSocketClient(uri) {
 
-        override fun onOpen(handshakedata: ServerHandshake?) {
+        override fun onOpen(handshake: ServerHandshake?) {
             LOG.info("WS client connected")
         }
 

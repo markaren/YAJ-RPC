@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.net.InetSocketAddress
 
-class RpcWebSocketServer(
+open class RpcWebSocketServer(
         private val handler: RpcHandler
 ): RpcServer {
 
