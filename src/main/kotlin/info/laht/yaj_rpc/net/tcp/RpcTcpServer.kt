@@ -50,7 +50,7 @@ open class RpcTcpServer(
     override fun start(port: Int) {
         if (server == null) {
             server = ServerSocket(port)
-            LOG.info("${javaClass.simpleName} listening for connections on port: $port")
+            LOG.info("TCP server listening for connections on port: $port")
             Thread({
                 while(!stop) {
                     try {

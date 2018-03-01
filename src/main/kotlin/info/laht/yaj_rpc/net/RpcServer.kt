@@ -24,10 +24,12 @@
 
 package info.laht.yaj_rpc.net
 
+import java.io.Closeable
+
 /**
  * @author Lars Ivar Hatledal
  */
-interface RpcServer: AutoCloseable {
+interface RpcServer: Closeable {
 
     /**
      * Start the server using the provided port number

@@ -6,13 +6,14 @@ import info.laht.yaj_rpc.net.tcp.RpcTcpClient;
 import info.laht.yaj_rpc.net.tcp.RpcTcpServer;
 import kotlin.Unit;
 
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class TcpDemo {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
 
         RpcHandler handler = new RpcHandler(new SampleService());
 

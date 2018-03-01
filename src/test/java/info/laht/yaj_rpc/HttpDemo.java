@@ -5,11 +5,12 @@ import info.laht.yaj_rpc.net.RpcServer;
 import info.laht.yaj_rpc.net.http.RpcHttpClient;
 import info.laht.yaj_rpc.net.http.RpcHttpServer;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class HttpDemo {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
 
         RpcHandler handler = new RpcHandler(new SampleService());
 
