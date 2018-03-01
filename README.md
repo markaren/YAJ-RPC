@@ -7,8 +7,10 @@
 
 
 
-Yet Another JSON RPC (YAJ-RPC) is a JSON RPC 2.0 implementation for JVM languages written in Kotlin.
+Yet Another JSON-RPC (YAJ-RPC) is a JSON RPC 2.0 implementation for JVM languages written in Kotlin.
 
-Client and server for WebSockets, TCP/IP and HTTP are included, but the RPC implementations itself is totally independent from any networking logic.
+
+Client and server for WebSockets, TCP/IP ZeroMQ and HTTP are included, 
+but the RPC implementations itself is totally independent from any networking logic.
 
 To get started head over to the [Wiki](https://github.com/markaren/YAJ-RPC/wiki)!
