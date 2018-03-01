@@ -6,6 +6,8 @@ import info.laht.yaj_rpc.net.ws.RpcWebSocketClient;
 import info.laht.yaj_rpc.net.ws.RpcWebSocketServer;
 import kotlin.Unit;
 
+import java.util.Scanner;
+
 class WebSocketDemo {
 
     public static void main(String[] args) throws Exception {
@@ -24,9 +26,15 @@ class WebSocketDemo {
         System.out.println(result);
 
         client.writeAsync("SampleService.greet", params, res -> {
-            System.out.println(res.getResult(String.class));
+            System.out.println(res.getResult(String.class)); //prints 'Hello Client Eastwood!'
             return Unit.INSTANCE;
         });
+
+        System.out.println("Press any key to exit..");
+        Scanner sc = new Scanner(System.in);
+        if (sc.hasNext()) {
+            System.out.println("exiting..");
+        }
 
         client.close();
         server.close();
