@@ -34,7 +34,7 @@ import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 
 
-class RpcHttpServer(
+open class RpcHttpServer(
         val handler: RpcHandler
 ): SimpleHTTPServer(), RpcServer {
 
