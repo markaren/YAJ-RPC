@@ -29,14 +29,14 @@ class TestHttp {
     @After
     fun tearDown() {
         client.close()
-        server.stop()
+        server.close()
     }
 
     @Test
     fun test1() {
 
-        client.write("SampleService.greet", RpcListParams("per")).also {
-            println("syncronous response=${it.getResult(String::class.java)}")
+        client.write("SampleService.greet", RpcParams.mapParams("name" to "Clint Eastwood")).also {
+            println("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }

@@ -12,7 +12,7 @@ buildscript {
 def snapshot = true
 
 group 'info.laht'
-version '0.4'
+version '0.5'
 
 if (snapshot) {
     version += '-SNAPSHOT'

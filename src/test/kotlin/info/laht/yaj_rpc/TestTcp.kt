@@ -38,14 +38,14 @@ class TestTcp {
     fun test1() {
 
         val latch = CountDownLatch(1)
-        client.writeAsync("SampleService.greet", RpcParams.listParams("per"), {
-            println("async response=${it.getResult(String::class.java)}")
+        client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood"), {
+            println("Async response=${it.getResult(String::class.java)}")
             latch.countDown()
         })
         latch.await(1000, TimeUnit.MILLISECONDS)
 
-        client.write("SampleService.greet", RpcListParams("per")).also {
-            println("syncronous response=${it.getResult(String::class.java)}")
+        client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
+            println("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }

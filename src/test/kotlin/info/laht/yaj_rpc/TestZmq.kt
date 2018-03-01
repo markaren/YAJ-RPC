@@ -35,8 +35,8 @@ class TestZmq {
     @Test
     fun test1() {
 
-        client.write("SampleService.greet", RpcListParams("per")).also {
-            println("syncronous response=${it.getResult(String::class.java)}")
+        client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
+            println("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }
