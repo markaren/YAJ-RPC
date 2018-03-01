@@ -39,29 +39,16 @@ internal object JsonParser {
 
     private val LOG: Logger = LoggerFactory.getLogger(JsonParser::class.java)
 
-    private var changed = false
-    private var _gson: Gson? = null
+    private val builder = GsonBuilder()
+            .serializeNulls()
 
-    private val builder by lazy {
-        GsonBuilder()
-                .serializeNulls()
-                .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
-               // .setPrettyPrinting()
-    }
-
-
-    val gson: Gson
-    get() {
-        if (changed || _gson == null) {
-            changed = false
-            _gson = builder.create()
-        }
-        return _gson!!
+    val gson: Gson by lazy {
+        builder.create()
     }
 
     fun registerTypeAdapter(type: Type, typeAdapter: Any) {
         builder.registerTypeAdapter(type, typeAdapter)
-        changed = true
+        LOG.debug("Registered gson type adapter for type '$type'")
     }
 
 }

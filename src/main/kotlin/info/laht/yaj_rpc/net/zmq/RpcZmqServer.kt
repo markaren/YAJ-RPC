@@ -19,7 +19,7 @@ open class RpcZmqServer(
         socket = ctx.socket(ZMQ.REP).apply {
             bind("tcp://*:$port")
         }
-        LOG.info("${javaClass.simpleName} listening for connections on port: $port")
+        LOG.info("ZMQ server listening for connections on port: $port")
         Thread {
 
             try {

@@ -1,8 +1,5 @@
-package info.laht.yaj_rpc.http
+package info.laht.yaj_rpc
 
-import info.laht.yaj_rpc.RpcHandler
-import info.laht.yaj_rpc.RpcListParams
-import info.laht.yaj_rpc.SampleService
 import info.laht.yaj_rpc.net.AbstractRpcClient
 import info.laht.yaj_rpc.net.RpcServer
 import info.laht.yaj_rpc.net.http.RpcHttpClient
@@ -32,14 +29,14 @@ class TestHttp {
     @After
     fun tearDown() {
         client.close()
-        server.stop()
+        server.close()
     }
 
     @Test
     fun test1() {
 
-        client.write("SampleService.greet", RpcListParams("per")).also {
-            println("syncronous response=${it.getResult(String::class.java)}")
+        client.write("SampleService.greet", RpcParams.mapParams("name" to "Clint Eastwood")).also {
+            println("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }

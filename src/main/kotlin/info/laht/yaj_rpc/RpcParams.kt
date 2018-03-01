@@ -13,6 +13,10 @@ sealed class RpcParams {
 
     companion object {
 
+        init {
+            JsonParser.registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
+        }
+
         @JvmStatic
         fun noParams() = RpcNoParams
 
@@ -24,6 +28,9 @@ sealed class RpcParams {
 
         @JvmStatic
         fun mapParams(value: Map<String, Any>) = RpcMapParams(value)
+
+        @JvmStatic
+        fun mapParams(vararg value: Pair<String, Any>) = RpcMapParams(value.toMap())
 
     }
 

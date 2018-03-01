@@ -1,13 +1,9 @@
-package info.laht.yaj_rpc.tcp
+package info.laht.yaj_rpc
 
-import info.laht.yaj_rpc.RpcHandler
-import info.laht.yaj_rpc.RpcListParams
-import info.laht.yaj_rpc.RpcParams
-import info.laht.yaj_rpc.SampleService
 import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
 import info.laht.yaj_rpc.net.RpcServer
-import info.laht.yaj_rpc.net.tcp.RpcTcpClient
-import info.laht.yaj_rpc.net.tcp.RpcTcpServer
+import info.laht.yaj_rpc.net.ws.RpcWebSocketClient
+import info.laht.yaj_rpc.net.ws.RpcWebSocketServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -15,7 +11,7 @@ import java.net.ServerSocket
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class TestTcp {
+class TestWs {
 
     lateinit var server: RpcServer
     lateinit var client: AbstractAsyncRpcClient
@@ -24,11 +20,11 @@ class TestTcp {
     fun setup() {
 
         val port = ServerSocket(0).use { it.localPort }
-        server = RpcTcpServer(RpcHandler(SampleService())).also {
+        server = RpcWebSocketServer(RpcHandler(SampleService())).also {
             it.start(port)
         }
 
-        client = RpcTcpClient("localhost", port)
+        client = RpcWebSocketClient("localhost", port)
 
     }
 
@@ -42,14 +38,14 @@ class TestTcp {
     fun test1() {
 
         val latch = CountDownLatch(1)
-        client.writeAsync("SampleService.greet", RpcParams.listParams("per"), {
-            println("async response=${it.getResult(String::class.java)}")
+        client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood"), {
+            println("Async response=${it.getResult(String::class.java)}")
             latch.countDown()
         })
         latch.await(1000, TimeUnit.MILLISECONDS)
 
-        client.write("SampleService.greet", RpcListParams("per")).also {
-            println("syncronous response=${it.getResult(String::class.java)}")
+        client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
+            println("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }

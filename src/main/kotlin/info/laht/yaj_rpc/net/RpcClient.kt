@@ -34,11 +34,12 @@ import java.util.concurrent.CountDownLatch
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.Closeable
 
 
 typealias Consumer<T> = (T) -> Unit
 
-interface RpcClient: AutoCloseable {
+interface RpcClient: Closeable {
 
     fun notify(methodName: String, params: RpcParams = RpcParams.noParams())
     fun write(methodName: String, params: RpcParams = RpcNoParams): RpcResponse

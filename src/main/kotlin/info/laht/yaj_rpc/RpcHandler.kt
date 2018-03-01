@@ -173,12 +173,12 @@ class RpcHandler private constructor(
         return List<Any>(types.size, {i->
             val arg = types[i]
             val param = params[i]
-            when {
-                arg == Boolean::class.java || arg == Boolean::class.javaPrimitiveType -> param.asBoolean
-                arg == Long::class.java || arg == Long::class.javaPrimitiveType -> param.asLong
-                arg == Int::class.java || arg == Int::class.javaPrimitiveType -> param.asInt
-                arg == Float::class.java || arg == Float::class.javaPrimitiveType -> param.asFloat
-                arg == Double::class.java || arg == Double::class.javaPrimitiveType -> param.asDouble
+            when (arg) {
+                Boolean::class.java, Boolean::class.javaPrimitiveType -> param.asBoolean
+                Long::class.java, Long::class.javaPrimitiveType -> param.asLong
+                Int::class.java, Int::class.javaPrimitiveType -> param.asInt
+                Float::class.java, Float::class.javaPrimitiveType -> param.asFloat
+                Double::class.java, Double::class.javaPrimitiveType -> param.asDouble
                 else -> JsonParser.gson.fromJson(param, arg)
             }
         })
