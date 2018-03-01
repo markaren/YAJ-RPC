@@ -45,7 +45,7 @@ open class RpcWebSocketServer(
         if (ws == null) {
             ws = WebSocketServerImpl(port).also {
                 it.start()
-                LOG.info("RpcWebSocketServer listening for connections on port: $port")
+                LOG.info("${javaClass.simpleName} listening for connections on port: $port")
             }
         } else {
             LOG.warn("RpcWebSocketServer has already been started!")

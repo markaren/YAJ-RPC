@@ -41,7 +41,6 @@ class TestWs {
     @Test
     fun test1() {
 
-
         val latch = CountDownLatch(1)
         client.writeAsync("SampleService.greet", RpcParams.listParams("per"), {
             println("async response=${it.getResult(String::class.java)}")
@@ -54,6 +53,5 @@ class TestWs {
         }
 
     }
-
 
 }

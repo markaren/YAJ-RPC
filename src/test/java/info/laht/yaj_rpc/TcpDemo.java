@@ -6,6 +6,7 @@ import info.laht.yaj_rpc.net.tcp.RpcTcpClient;
 import info.laht.yaj_rpc.net.tcp.RpcTcpServer;
 import kotlin.Unit;
 
+import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -21,20 +22,23 @@ public class TcpDemo {
 
         AbstractAsyncRpcClient client = new RpcTcpClient("localhost", port);
 
-        RpcParams params = RpcParams.listParams("Clint Eastwood");
+        client.notify("SampleService.returnNothing", RpcParams.noParams());
 
+        RpcParams params = RpcParams.listParams("Clint Eastwood");
         RpcResponse response = client.write("SampleService.greet", params);
         String result = response.getResult(String.class); //prints 'Hello Client Eastwood!'
-        System.out.println(result);
+        System.out.println("Response=" + result);
 
-        CountDownLatch latch = new CountDownLatch(1);
         client.writeAsync("SampleService.greet", params, res -> {
-            System.out.println(res.getResult(String.class));
-            latch.countDown();
+            System.out.println(res.getResult(String.class)); //prints 'Hello Client Eastwood!'
             return Unit.INSTANCE;
         });
-        latch.await(1000, TimeUnit.MILLISECONDS);
 
+        System.out.println("Press any key to exit..");
+        Scanner sc = new Scanner(System.in);
+        if (sc.hasNext()) {
+            System.out.println("exiting..");
+        }
 
         client.close();
         server.close();

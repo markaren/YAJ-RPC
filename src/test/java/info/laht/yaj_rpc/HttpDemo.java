@@ -5,6 +5,8 @@ import info.laht.yaj_rpc.net.RpcServer;
 import info.laht.yaj_rpc.net.http.RpcHttpClient;
 import info.laht.yaj_rpc.net.http.RpcHttpServer;
 
+import java.util.Scanner;
+
 public class HttpDemo {
 
     public static void main(String[] args) throws Exception {
@@ -16,11 +18,19 @@ public class HttpDemo {
         server.start(port);
 
         AbstractRpcClient client = new RpcHttpClient("localhost", port);
-        RpcParams params = RpcParams.listParams("Clint Eastwood");
 
+        client.notify("SampleService.returnNothing", RpcParams.noParams());
+
+        RpcParams params = RpcParams.listParams("Clint Eastwood");
         RpcResponse response = client.write("SampleService.greet", params);
         String result = response.getResult(String.class); //prints 'Hello Client Eastwood!'
-        System.out.println(result);
+        System.out.println("Response=" + result);
+
+        System.out.println("Press any key to exit..");
+        Scanner sc = new Scanner(System.in);
+        if (sc.hasNext()) {
+            System.out.println("exiting..");
+        }
 
         client.close();
         server.close();

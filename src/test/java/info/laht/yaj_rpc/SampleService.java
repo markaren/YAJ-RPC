@@ -25,7 +25,7 @@ public class SampleService implements RpcService {
     @RpcMethod
     public String greet(String name) {
         LOG.debug("method greet called");
-        return "Hello " + name;
+        return "Hello, " + name + '!';
     }
 
     @RpcMethod
