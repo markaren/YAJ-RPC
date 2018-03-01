@@ -1,24 +1,22 @@
 package info.laht.yaj_rpc;
 
-import info.laht.yaj_rpc.net.AbstractAsyncRpcClient;
+import info.laht.yaj_rpc.net.AbstractRpcClient;
 import info.laht.yaj_rpc.net.RpcServer;
-import info.laht.yaj_rpc.net.ws.RpcWebSocketClient;
-import info.laht.yaj_rpc.net.ws.RpcWebSocketServer;
-import kotlin.Unit;
+import info.laht.yaj_rpc.net.zmq.RpcZmqClient;
+import info.laht.yaj_rpc.net.zmq.RpcZmqServer;
 
 import java.util.Scanner;
 
-class WebSocketDemo {
+public class ZmqTest {
 
     public static void main(String[] args) throws Exception {
-
         RpcHandler handler = new RpcHandler(new SampleService());
 
         int port = PortFinder.availablePort();
-        RpcServer server = new RpcWebSocketServer(handler);
+        RpcServer server = new RpcZmqServer(handler);
         server.start(port);
 
-        AbstractAsyncRpcClient client = new RpcWebSocketClient("localhost", port);
+        AbstractRpcClient client = new RpcZmqClient("localhost", port);
 
         client.notify("SampleService.returnNothing", RpcParams.noParams());
 
@@ -26,11 +24,6 @@ class WebSocketDemo {
         RpcResponse response = client.write("SampleService.greet", params);
         String result = response.getResult(String.class); //prints 'Hello Client Eastwood!'
         System.out.println("Response=" + result);
-
-        client.writeAsync("SampleService.greet", params, res -> {
-            System.out.println(res.getResult(String.class)); //prints 'Hello Client Eastwood!'
-            return Unit.INSTANCE;
-        });
 
         System.out.println("Press any key to exit..");
         Scanner sc = new Scanner(System.in);
@@ -40,7 +33,6 @@ class WebSocketDemo {
 
         client.close();
         server.close();
-
     }
 
 }

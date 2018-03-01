@@ -18,11 +18,13 @@ public class HttpDemo {
         server.start(port);
 
         AbstractRpcClient client = new RpcHttpClient("localhost", port);
-        RpcParams params = RpcParams.listParams("Clint Eastwood");
 
+        client.notify("SampleService.returnNothing", RpcParams.noParams());
+
+        RpcParams params = RpcParams.listParams("Clint Eastwood");
         RpcResponse response = client.write("SampleService.greet", params);
         String result = response.getResult(String.class); //prints 'Hello Client Eastwood!'
-        System.out.println(result);
+        System.out.println("Response=" + result);
 
         System.out.println("Press any key to exit..");
         Scanner sc = new Scanner(System.in);

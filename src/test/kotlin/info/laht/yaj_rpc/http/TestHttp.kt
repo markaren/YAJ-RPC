@@ -1,22 +1,16 @@
-package info.laht.yaj_rpc.htpp
+package info.laht.yaj_rpc.http
 
 import info.laht.yaj_rpc.RpcHandler
 import info.laht.yaj_rpc.RpcListParams
-import info.laht.yaj_rpc.RpcParams
 import info.laht.yaj_rpc.SampleService
-import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
 import info.laht.yaj_rpc.net.AbstractRpcClient
 import info.laht.yaj_rpc.net.RpcServer
 import info.laht.yaj_rpc.net.http.RpcHttpClient
 import info.laht.yaj_rpc.net.http.RpcHttpServer
-import info.laht.yaj_rpc.net.tcp.RpcTcpClient
-import info.laht.yaj_rpc.net.tcp.RpcTcpServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.net.ServerSocket
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 class TestHttp {
 
