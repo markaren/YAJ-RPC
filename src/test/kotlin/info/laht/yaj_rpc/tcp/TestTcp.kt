@@ -52,9 +52,6 @@ class TestTcp {
             println("syncronous response=${it.getResult(String::class.java)}")
         }
 
-
-
-
     }
 
 }

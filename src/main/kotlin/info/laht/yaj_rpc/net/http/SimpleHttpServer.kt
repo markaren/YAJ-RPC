@@ -50,7 +50,7 @@ abstract class SimpleHTTPServer {
             start()
         }
 
-        LOG.info("Serving http on port: $port")
+        LOG.info("${javaClass.simpleName} listening for connections on port: $port")
     }
 
     fun stop() {

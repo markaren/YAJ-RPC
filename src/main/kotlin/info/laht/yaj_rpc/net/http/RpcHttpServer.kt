@@ -38,18 +38,18 @@ open class RpcHttpServer(
         val handler: RpcHandler
 ): SimpleHTTPServer(), RpcServer {
 
-    val legalContentTypes by lazy {
-        listOf("application/json-rpc",
+    val legalContentTypes =
+        arrayOf("application/json-rpc",
                 "application/json",
                 "application/jsonrequest")
-    }
+
 
     override val context: String
         get() = "/jsonrpc"
 
     override val httpHandler: HttpHandler by lazy { MyHttpHandler() }
 
-    inner class MyHttpHandler: HttpHandler {
+    private inner class MyHttpHandler: HttpHandler {
 
         private fun noResponse(t: HttpExchange) {
             t.sendResponseHeaders(204, 0L).also {  t.responseBody.use {  }}
