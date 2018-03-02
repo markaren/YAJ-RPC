@@ -1,7 +1,6 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.*
-import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.reflect.Type
 
 /**
@@ -12,10 +11,6 @@ sealed class RpcParams {
     abstract val paramCount: Int
 
     companion object {
-
-        init {
-            JsonParser.registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
-        }
 
         @JvmStatic
         fun noParams() = RpcNoParams
@@ -89,8 +84,8 @@ class RpcParamsTypeAdapter : JsonDeserializer<RpcParams>, JsonSerializer<RpcPara
 
         return when(src) {
             RpcNoParams -> null
-            is RpcListParams<*> -> JsonParser.gson.toJsonTree(src.value)
-            is RpcMapParams<*> -> JsonParser.gson.toJsonTree(src.value)
+            is RpcListParams<*> -> YAJ_RPC.toJsonTree(src.value)
+            is RpcMapParams<*> -> YAJ_RPC.toJsonTree(src.value)
         }
 
     }

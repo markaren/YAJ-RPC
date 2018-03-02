@@ -25,7 +25,6 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.JsonElement
-import info.laht.yaj_rpc.parser.JsonParser
 import java.lang.reflect.Method
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -43,7 +42,7 @@ class RpcHandler private constructor(
     fun getOpenMessage(): String {
         return services.entries.associate {
             it.key to RpcService.getCallDescription(it.value)
-        }.let { JsonParser.gson.toJson(it) }
+        }.let { YAJ_RPC.toJson(it) }
     }
 
     fun handle(json: String): String? {
@@ -170,7 +169,7 @@ class RpcHandler private constructor(
             throw AssertionError("params.length != types.length")
         }
 
-        return List<Any>(types.size, {i->
+        return List(types.size, {i->
             val arg = types[i]
             val param = params[i]
             when (arg) {
@@ -179,7 +178,7 @@ class RpcHandler private constructor(
                 Int::class.java, Int::class.javaPrimitiveType -> param.asInt
                 Float::class.java, Float::class.javaPrimitiveType -> param.asFloat
                 Double::class.java, Double::class.javaPrimitiveType -> param.asDouble
-                else -> JsonParser.gson.fromJson(param, arg)
+                else -> YAJ_RPC.fromJson(param, arg)
             }
         })
 
@@ -199,15 +198,15 @@ class RpcHandler private constructor(
                 it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
                 it[ERROR_KEY] = errorType.toMap(data)
                 it[ID_KEY] = id
-            }.let { JsonParser.gson.toJson(it) }
+            }.let { YAJ_RPC.toJson(it) }
         }
 
         fun createResponse(result: Any?, id: Any): String {
             return mutableMapOf<String, Any>().also {
                 it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
-                it[RESULT_KEY] = JsonParser.gson.toJson(result)
+                it[RESULT_KEY] = YAJ_RPC.toJson(result)
                 it[ID_KEY] = id
-            }.let { JsonParser.gson.toJson(it) }
+            }.let { YAJ_RPC.toJson(it) }
         }
 
     }

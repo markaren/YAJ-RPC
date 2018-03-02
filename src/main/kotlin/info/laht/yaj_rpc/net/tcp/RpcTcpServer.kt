@@ -51,7 +51,9 @@ open class RpcTcpServer(
         if (server == null) {
             server = ServerSocket(port)
             LOG.info("TCP server listening for connections on port: $port")
-            Thread({
+
+            Thread {
+
                 while(!stop) {
                     try {
                         val accept: Socket = server!!.accept()!!
@@ -62,16 +64,22 @@ open class RpcTcpServer(
 
                     }
                 }
-            }).start()
+
+                LOG.debug("RpcTcpServer server stopped!")
+
+            }.start()
         } else {
             LOG.warn("RpcTcpServer has already been started!")
         }
     }
 
     override fun stop() {
-        stop = true
-        server?.close()
-        LOG.debug("RpcTcpServer server stopped!")
+
+        server?.apply {
+            stop = true
+            close()
+        }
+
     }
 
     inner class ClientHandler(
@@ -93,6 +101,7 @@ open class RpcTcpServer(
                         `in`.read(it, 0, len)
                     }.let { String(it).replace(0.toChar(), ' ').trim() }
 
+                    LOG.debug("Received: $msg")
                     if (msg.isNotEmpty()) {
                         handler.handle(msg)?.also {
                             write(it)

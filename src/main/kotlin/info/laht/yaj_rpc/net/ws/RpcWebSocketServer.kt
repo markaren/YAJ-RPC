@@ -45,7 +45,7 @@ open class RpcWebSocketServer(
         if (ws == null) {
             ws = WebSocketServerImpl(port).also {
                 it.start()
-                LOG.info("WS server listening for connections on port: $port")
+                LOG.info("RpcWebSocketServer listening for connections on port: $port")
             }
         } else {
             LOG.warn("RpcWebSocketServer has already been started!")
@@ -56,6 +56,7 @@ open class RpcWebSocketServer(
         ws?.also {
             clients.forEach { it.close() }
             it.stop()
+            LOG.debug("RpcWebSocketServer server stopped!")
         }
     }
 
@@ -83,6 +84,7 @@ open class RpcWebSocketServer(
         }
 
         override fun onMessage(conn: WebSocket, message: String) {
+            LOG.debug("Received: $message")
             handler.handle(message)?.also {response ->
                 conn.send(response)
             }

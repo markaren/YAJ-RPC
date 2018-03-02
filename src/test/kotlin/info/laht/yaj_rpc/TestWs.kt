@@ -7,6 +7,8 @@ import info.laht.yaj_rpc.net.ws.RpcWebSocketServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.net.ServerSocket
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -39,15 +41,19 @@ class TestWs {
 
         val latch = CountDownLatch(1)
         client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood"), {
-            println("Async response=${it.getResult(String::class.java)}")
+            LOG.info("Async response=${it.getResult(String::class.java)}")
             latch.countDown()
         })
         latch.await(1000, TimeUnit.MILLISECONDS)
 
         client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
-            println("Synchronous response=${it.getResult(String::class.java)}")
+            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
 
+    }
+
+    companion object {
+        val LOG: Logger = LoggerFactory.getLogger(TestHttp::class.java)
     }
 
 }

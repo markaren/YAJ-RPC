@@ -26,9 +26,6 @@ package info.laht.yaj_rpc
 
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
-import info.laht.yaj_rpc.parser.JsonParser
-import java.lang.IllegalStateException
-import java.lang.reflect.Type
 
 interface RpcResponse {
 
@@ -41,7 +38,7 @@ interface RpcResponse {
     companion object {
 
         fun fromJson(json: String): RpcResponse {
-            return JsonParser.gson.fromJson(json, RpcResponseImpl::class.java)
+            return YAJ_RPC.fromJson(json, RpcResponseImpl::class.java)
         }
 
     }

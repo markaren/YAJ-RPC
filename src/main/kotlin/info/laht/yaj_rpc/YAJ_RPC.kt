@@ -22,11 +22,11 @@
  * THE SOFTWARE.
  */
 
-package info.laht.yaj_rpc.parser
+package info.laht.yaj_rpc
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import info.laht.yaj_rpc.*
+import com.google.gson.JsonElement
 import java.lang.reflect.Type
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -35,20 +35,30 @@ import org.slf4j.LoggerFactory
  *
  * @author Lars Ivar Hatledal
  */
-internal object JsonParser {
+object YAJ_RPC {
 
-    private val LOG: Logger = LoggerFactory.getLogger(JsonParser::class.java)
+    private val LOG: Logger = LoggerFactory.getLogger(YAJ_RPC::class.java)
 
     private val builder = GsonBuilder()
+            .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
             .serializeNulls()
 
-    val gson: Gson by lazy {
+    private val jsonParser: Gson by lazy {
         builder.create()
     }
 
+    fun toJson(`object`: Any?): String = jsonParser.toJson(`object`)
+
+    internal fun toJsonTree(any: Any): JsonElement = jsonParser.toJsonTree(any)
+
+    internal fun <T> fromJson(json: JsonElement, type: Class<T>) = jsonParser.fromJson(json, type)
+
+    fun <T> fromJson(json: String, type: Class<T>) = jsonParser.fromJson(json, type)
+
+    @JvmStatic
     fun registerTypeAdapter(type: Type, typeAdapter: Any) {
         builder.registerTypeAdapter(type, typeAdapter)
-        LOG.debug("Registered gson type adapter for type '$type'")
+        LOG.debug("Registered jsonParser type adapter for type '$type'")
     }
 
 }

@@ -19,7 +19,7 @@ open class RpcZmqServer(
         socket = ctx.socket(ZMQ.REP).apply {
             bind("tcp://*:$port")
         }
-        LOG.info("ZMQ server listening for connections on port: $port")
+        LOG.info("RpcZmqServer listening for connections on port: $port")
         Thread {
 
             try {
@@ -36,6 +36,9 @@ open class RpcZmqServer(
             } catch (ex: Exception) {
                 LOG.debug("Caught exception", ex)
             }
+
+            LOG.debug("RpcZmqServer server stopped!")
+
         }.start()
 
     }

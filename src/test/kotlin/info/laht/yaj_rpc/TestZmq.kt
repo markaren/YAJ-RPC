@@ -7,6 +7,8 @@ import info.laht.yaj_rpc.net.zmq.RpcZmqServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.net.ServerSocket
 
 class TestZmq {
@@ -36,8 +38,13 @@ class TestZmq {
     fun test1() {
 
         client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
-            println("Synchronous response=${it.getResult(String::class.java)}")
+            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }
+
+    companion object {
+        val LOG: Logger = LoggerFactory.getLogger(TestHttp::class.java)
+    }
+
 }
