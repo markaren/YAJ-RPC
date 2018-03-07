@@ -79,5 +79,4 @@ abstract class SimpleHTTPServer {
         private val LOG: Logger = LoggerFactory.getLogger(SimpleHTTPServer::class.java)
     }
 
-
 }

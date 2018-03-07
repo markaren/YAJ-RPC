@@ -84,7 +84,7 @@ open class RpcWebSocketServer(
         }
 
         override fun onMessage(conn: WebSocket, message: String) {
-            LOG.debug("Received: $message")
+            LOG.trace("Received: $message")
             handler.handle(message)?.also {response ->
                 conn.send(response)
             }

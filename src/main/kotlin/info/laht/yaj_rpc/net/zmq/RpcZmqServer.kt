@@ -28,6 +28,8 @@ open class RpcZmqServer(
                         String(it, ZMQ.CHARSET)
                     }
 
+                    LOG.trace("Received: $recv")
+
                     handler.handle(recv)?.also {
                         socket.send(it, 0)
                     } ?: socket.send("", 0)

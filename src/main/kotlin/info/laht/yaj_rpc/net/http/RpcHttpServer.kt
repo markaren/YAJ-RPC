@@ -71,7 +71,7 @@ open class RpcHttpServer(
                     String(out.toByteArray(), Charset.forName("UTF-8"))
                 }
 
-                LOG.debug("Received: $data")
+                LOG.trace("Received: $data")
                 handler.handle(data)?.also { response ->
                     val bytes = response.toByteArray(Charset.forName("UTF-8"))
                     t.sendResponseHeaders(200, bytes.size.toLong())
