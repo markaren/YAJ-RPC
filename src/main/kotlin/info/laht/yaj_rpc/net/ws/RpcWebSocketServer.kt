@@ -56,9 +56,9 @@ open class RpcWebSocketServer(
     }
 
     override fun stop() {
-        ws?.apply {
+        ws?.also {
             clients.forEach { it.close() }
-            stop()
+            it.stop()
             ws = null
             LOG.debug("${javaClass.simpleName} stopped!")
         }

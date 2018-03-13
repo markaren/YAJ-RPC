@@ -64,10 +64,10 @@ abstract class SimpleHTTPServer {
     }
 
     fun stop() {
-        server?.apply {
-            stop(0)
-            LOG.info("${javaClass.simpleName} stopped!")
+        server?.also {
+            it.stop(0)
             server = null
+            LOG.info("${javaClass.simpleName} stopped!")
         }
     }
 

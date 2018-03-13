@@ -44,9 +44,8 @@ open class RpcTcpServer(
         private val handler: RpcHandler
 ): RpcServer {
 
+    private var stop = false
     override var port: Int? = null
-
-    private var stop = false;
     private var server: ServerSocket? = null
 
     override fun start(port: Int) {
@@ -54,7 +53,7 @@ open class RpcTcpServer(
         if (server == null) {
             this.port = port
             server = ServerSocket(port)
-            LOG.info("${RpcTcpServer::class.java} listening for connections on port: $port")
+            LOG.info("${javaClass.simpleName} listening for connections on port: $port")
 
             Thread {
 
@@ -73,14 +72,14 @@ open class RpcTcpServer(
 
             }.start()
         } else {
-            LOG.warn("${javaClass.simpleName} is already runnning!")
+            LOG.warn("${javaClass.simpleName} is already running!")
         }
     }
 
     override fun stop() {
-        server?.apply {
+        server?.also {
             stop = true
-            close()
+            it.close()
             server = null
         }
     }
@@ -120,9 +119,11 @@ open class RpcTcpServer(
         private fun write(data: String) {
             val bytes = data.toByteArray()
             val len = bytes.size.let { (ByteBuffer.allocate(4).putInt(it).array()) }
-            out.write(len)
-            out.write(bytes)
-            out.flush()
+            out.apply {
+                write(len)
+                write(bytes)
+                flush()
+            }
         }
 
     }
