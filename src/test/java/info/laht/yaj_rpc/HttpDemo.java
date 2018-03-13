@@ -14,9 +14,8 @@ public class HttpDemo {
 
         RpcHandler handler = new RpcHandler(new SampleService());
 
-        int port = PortFinder.availablePort();
         RpcServer server = new RpcHttpServer(handler);
-        server.start(port);
+        int port = server.start();
 
         AbstractRpcClient client = new RpcHttpClient("localhost", port);
 

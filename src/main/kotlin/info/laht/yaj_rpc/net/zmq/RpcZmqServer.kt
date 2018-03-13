@@ -10,43 +10,58 @@ open class RpcZmqServer(
         private val handler: RpcHandler
 ): RpcServer {
 
-    private lateinit var ctx: ZMQ.Context
-    private lateinit var socket: ZMQ.Socket
+    override var port: Int? = null
+
+    private var ctx: ZMQ.Context? = null
+    private var socket: ZMQ.Socket? = null
+
 
     override fun start(port: Int) {
 
-        ctx = ZMQ.context(1)
-        socket = ctx.socket(ZMQ.REP).apply {
-            bind("tcp://*:$port")
-        }
-        LOG.info("RpcZmqServer listening for connections on port: $port")
-        Thread {
+        if (socket == null) {
 
-            try {
-                while (true) {
-                    val recv = socket.recv(0).let {
-                        String(it, ZMQ.CHARSET)
+            this.port = port
+            ctx = ZMQ.context(1)
+            socket = ctx!!.socket(ZMQ.REP).apply {
+
+                bind("tcp://*:$port")
+
+                Thread {
+
+                    try {
+                        while (true) {
+                            recv(0).let {
+                                handler.handle(String(it, ZMQ.CHARSET))?.also {
+                                    send(it, 0)
+                                } ?: send("", 0)
+                            }
+                        }
+                    } catch (ex: Exception) {
+                        LOG.trace("Caught exception", ex)
                     }
 
-                    handler.handle(recv)?.also {
-                        socket.send(it, 0)
-                    } ?: socket.send("", 0)
+                    LOG.debug("${javaClass.simpleName} server stopped!")
 
-                }
-            } catch (ex: Exception) {
-                LOG.debug("Caught exception", ex)
+                }.start()
+
+                LOG.info("${javaClass.simpleName} listening for connections on port: $port")
+
             }
 
-            LOG.debug("RpcZmqServer server stopped!")
-
-        }.start()
+        } else {
+            LOG.warn("${javaClass.simpleName} is already running!")
+        }
 
     }
 
     override fun stop() {
-        if (::ctx.isInitialized && ::socket.isInitialized) {
-            socket.close()
-            ctx.term()
+        socket?.apply {
+            close()
+            socket = null
+        }
+        ctx?.apply {
+            term()
+            ctx = null
         }
     }
 

@@ -4,9 +4,7 @@ import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
 import info.laht.yaj_rpc.net.RpcServer
 import info.laht.yaj_rpc.net.ws.RpcWebSocketClient
 import info.laht.yaj_rpc.net.ws.RpcWebSocketServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.ServerSocket
@@ -15,26 +13,31 @@ import java.util.concurrent.TimeUnit
 
 class TestWs {
 
-    lateinit var server: RpcServer
-    lateinit var client: AbstractAsyncRpcClient
+   companion object {
 
-    @Before
-    fun setup() {
+       val LOG: Logger = LoggerFactory.getLogger(TestWs::class.java)
 
-        val port = ServerSocket(0).use { it.localPort }
-        server = RpcWebSocketServer(RpcHandler(SampleService())).also {
-            it.start(port)
-        }
+       lateinit var server: RpcServer
+       lateinit var client: AbstractAsyncRpcClient
 
-        client = RpcWebSocketClient("localhost", port)
+       @JvmStatic
+       @BeforeClass
+       fun setup() {
 
-    }
+           server = RpcWebSocketServer(RpcHandler(SampleService()))
+           val port = server.start()
 
-    @After
-    fun tearDown() {
-        client.close()
-        server.stop()
-    }
+           client = RpcWebSocketClient("localhost", port)
+
+       }
+
+       @JvmStatic
+       @AfterClass
+       fun tearDown() {
+           client.close()
+           server.stop()
+       }
+   }
 
     @Test
     fun test1() {
@@ -52,8 +55,5 @@ class TestWs {
 
     }
 
-    companion object {
-        val LOG: Logger = LoggerFactory.getLogger(TestHttp::class.java)
-    }
 
 }

@@ -4,34 +4,38 @@ import info.laht.yaj_rpc.net.AbstractRpcClient
 import info.laht.yaj_rpc.net.RpcServer
 import info.laht.yaj_rpc.net.zmq.RpcZmqClient
 import info.laht.yaj_rpc.net.zmq.RpcZmqServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
+import org.junit.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.net.ServerSocket
 
 class TestZmq {
 
-    lateinit var server: RpcServer
-    lateinit var client: AbstractRpcClient
+    companion object {
 
-    @Before
-    fun setup() {
+        val LOG: Logger = LoggerFactory.getLogger(TestZmq::class.java)
 
-        val port = ServerSocket(0).use { it.localPort }
-        server = RpcZmqServer(RpcHandler(SampleService())).also {
-            it.start(port)
+        lateinit var server: RpcServer
+        lateinit var client: AbstractRpcClient
+
+        @JvmStatic
+        @BeforeClass
+        fun setup() {
+
+            server = RpcZmqServer(RpcHandler(SampleService()))
+            val port = server.start()
+
+            client = RpcZmqClient("localhost", port)
+
         }
 
-        client = RpcZmqClient("localhost", port)
+        @JvmStatic
+        @AfterClass
+        fun tearDown() {
+            client.close()
+            server.stop()
+        }
 
-    }
-
-    @After
-    fun tearDown() {
-        client.close()
-        server.stop()
     }
 
     @Test
@@ -43,8 +47,5 @@ class TestZmq {
 
     }
 
-    companion object {
-        val LOG: Logger = LoggerFactory.getLogger(TestHttp::class.java)
-    }
 
 }

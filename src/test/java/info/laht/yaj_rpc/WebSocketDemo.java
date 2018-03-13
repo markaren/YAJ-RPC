@@ -14,9 +14,8 @@ class WebSocketDemo {
 
         RpcHandler handler = new RpcHandler(new SampleService());
 
-        int port = PortFinder.availablePort();
         RpcServer server = new RpcWebSocketServer(handler);
-        server.start(port);
+        int port = server.start();
 
         AbstractAsyncRpcClient client = new RpcWebSocketClient("localhost", port);
 

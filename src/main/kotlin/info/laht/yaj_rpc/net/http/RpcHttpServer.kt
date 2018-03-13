@@ -26,13 +26,71 @@ package info.laht.yaj_rpc.net.http
 
 import com.sun.net.httpserver.HttpExchange
 import com.sun.net.httpserver.HttpHandler
+import com.sun.net.httpserver.HttpServer
 import info.laht.yaj_rpc.RpcHandler
 import info.laht.yaj_rpc.net.RpcServer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.net.InetSocketAddress
 import java.nio.charset.Charset
+import java.util.HashMap
 
+
+abstract class SimpleHTTPServer {
+
+    var port: Int? = null
+
+    private var server: HttpServer? = null
+    protected abstract val context: String
+    protected abstract val httpHandler: HttpHandler
+
+    @Throws(IOException::class)
+    fun start(port: Int) {
+
+        if (server == null) {
+            this.port = port
+            server = HttpServer.create(InetSocketAddress(port), 0).apply {
+                createContext(context, httpHandler)
+                executor = null
+                start()
+            }
+            LOG.info("${javaClass.simpleName} for connections on port: $port")
+        } else {
+            LOG.warn("${javaClass.simpleName} is already running!")
+        }
+
+    }
+
+    fun stop() {
+        server?.apply {
+            stop(0)
+            LOG.info("${javaClass.simpleName} stopped!")
+            server = null
+        }
+    }
+
+    protected fun queryToMap(query: String): Map<String, String> {
+
+        val result = HashMap<String, String>()
+        for (param in query.split("&".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
+            val pair = param.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            if (pair.size > 1) {
+                result[pair[0]] = pair[1]
+            } else {
+                result[pair[0]] = ""
+            }
+        }
+        return result
+    }
+
+    companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(SimpleHTTPServer::class.java)
+    }
+
+
+}
 
 open class RpcHttpServer(
         val handler: RpcHandler

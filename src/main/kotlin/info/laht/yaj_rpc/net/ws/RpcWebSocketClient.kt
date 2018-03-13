@@ -39,11 +39,8 @@ open class RpcWebSocketClient(
 ): AbstractAsyncRpcClient() {
 
     private val uri = URI("ws://$host:$port")
-    private val ws = WebSocketClientImpl()
+    private val ws = WebSocketClientImpl().apply {  connectBlocking() }
 
-    init {
-        ws.connectBlocking()
-    }
 
     override fun close() = ws.closeBlocking()
 

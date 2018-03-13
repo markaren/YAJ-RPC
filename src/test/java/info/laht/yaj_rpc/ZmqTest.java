@@ -13,9 +13,8 @@ public class ZmqTest {
     public static void main(String[] args) throws IOException {
         RpcHandler handler = new RpcHandler(new SampleService());
 
-        int port = PortFinder.availablePort();
-        RpcServer server = new RpcZmqServer(handler);
-        server.start(port);
+        RpcServer server = new RpcZmqServer( handler);
+        int port = server.start();
 
         AbstractRpcClient client = new RpcZmqClient("localhost", port);
 

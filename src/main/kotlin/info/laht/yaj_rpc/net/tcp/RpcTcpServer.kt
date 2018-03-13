@@ -41,16 +41,20 @@ import java.nio.charset.Charset
 
 
 open class RpcTcpServer(
-        val handler: RpcHandler
+        private val handler: RpcHandler
 ): RpcServer {
+
+    override var port: Int? = null
 
     private var stop = false;
     private var server: ServerSocket? = null
 
     override fun start(port: Int) {
+
         if (server == null) {
+            this.port = port
             server = ServerSocket(port)
-            LOG.info("TCP server listening for connections on port: $port")
+            LOG.info("${RpcTcpServer::class.java} listening for connections on port: $port")
 
             Thread {
 
@@ -61,25 +65,24 @@ open class RpcTcpServer(
                         val handler = ClientHandler(accept)
                         Thread(handler).start()
                     } catch (ex: IOException) {
-
+                        LOG.trace("Caught exception", ex)
                     }
                 }
 
-                LOG.debug("RpcTcpServer server stopped!")
+                LOG.debug("${javaClass.simpleName} stopped!")
 
             }.start()
         } else {
-            LOG.warn("RpcTcpServer has already been started!")
+            LOG.warn("${javaClass.simpleName} is already runnning!")
         }
     }
 
     override fun stop() {
-
         server?.apply {
             stop = true
             close()
+            server = null
         }
-
     }
 
     inner class ClientHandler(
@@ -110,7 +113,7 @@ open class RpcTcpServer(
 
                 }
             } catch (ex: IOException) {
-               // LOG.error("Exception caught in TCP client handler thread", ex)
+                LOG.trace("Exception caught in TCP client handler thread", ex)
             }
         }
 

@@ -38,25 +38,29 @@ open class RpcWebSocketServer(
         private val handler: RpcHandler
 ): RpcServer {
 
+    override var port: Int? = null
+
     private val clients = mutableSetOf<WebSocket>()
     private var ws: WebSocketServerImpl? = null
 
     override fun start(port: Int) {
         if (ws == null) {
+            this.port = port
             ws = WebSocketServerImpl(port).also {
                 it.start()
-                LOG.info("RpcWebSocketServer listening for connections on port: $port")
+                LOG.info("${javaClass.simpleName} listening for connections on port: $port")
             }
         } else {
-            LOG.warn("RpcWebSocketServer has already been started!")
+            LOG.warn("${javaClass.simpleName} is already running!")
         }
     }
 
     override fun stop() {
-        ws?.also {
+        ws?.apply {
             clients.forEach { it.close() }
-            it.stop()
-            LOG.debug("RpcWebSocketServer server stopped!")
+            stop()
+            ws = null
+            LOG.debug("${javaClass.simpleName} stopped!")
         }
     }
 
@@ -84,14 +88,14 @@ open class RpcWebSocketServer(
         }
 
         override fun onMessage(conn: WebSocket, message: String) {
-            LOG.debug("Received: $message")
+            LOG.trace("Received: $message")
             handler.handle(message)?.also {response ->
                 conn.send(response)
             }
         }
 
         override fun onError(conn: WebSocket?, ex: Exception) {
-            LOG.error("WS error", ex)
+            LOG.error("onError, conn=$conn", ex)
         }
     }
 

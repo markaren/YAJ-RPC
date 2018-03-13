@@ -65,7 +65,7 @@ open class RpcTcpClient(
 
                 }
             } catch (ex: IOException) {
-                //suppress
+                LOG.trace("Caught exception", ex)
             }
 
         }.start()

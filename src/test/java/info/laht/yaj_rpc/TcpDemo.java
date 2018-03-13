@@ -17,9 +17,8 @@ public class TcpDemo {
 
         RpcHandler handler = new RpcHandler(new SampleService());
 
-        int port = PortFinder.availablePort();
         RpcServer server = new RpcTcpServer(handler);
-        server.start(port);
+        int port = server.start();
 
         AbstractAsyncRpcClient client = new RpcTcpClient("localhost", port);
 
