@@ -104,8 +104,8 @@ open class RpcTcpServer(
                         `in`.read(it, 0, len)
                     }.let { String(it).replace(0.toChar(), ' ').trim() }
 
-                    LOG.debug("Received: $msg")
                     if (msg.isNotEmpty()) {
+                        LOG.trace("Received: $msg")
                         handler.handle(msg)?.also {
                             write(it)
                         }

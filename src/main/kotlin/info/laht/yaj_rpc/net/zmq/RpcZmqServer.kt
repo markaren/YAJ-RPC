@@ -22,19 +22,22 @@ open class RpcZmqServer(
 
             this.port = port
             ctx = ZMQ.context(1)
-            socket = ctx!!.socket(ZMQ.REP).apply {
+            socket = ctx!!.socket(ZMQ.REP).also {socket ->
 
-                bind("tcp://*:$port")
+                socket.bind("tcp://*:$port")
 
                 Thread {
 
                     try {
                         while (true) {
-                            recv(0).let {
-                                handler.handle(String(it, ZMQ.CHARSET))?.also {
-                                    send(it, 0)
-                                } ?: send("", 0)
-                            }
+
+                            val received = String(socket.recv(0), ZMQ.CHARSET)
+                            LOG.trace(received)
+
+                            handler.handle(received)?.also {
+                                socket.send(it, 0)
+                            } ?: socket.send("", 0)
+
                         }
                     } catch (ex: Exception) {
                         LOG.trace("Caught exception", ex)

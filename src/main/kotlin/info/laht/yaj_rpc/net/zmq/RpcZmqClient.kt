@@ -23,5 +23,4 @@ class RpcZmqClient(
         ctx.term()
     }
 
-
 }

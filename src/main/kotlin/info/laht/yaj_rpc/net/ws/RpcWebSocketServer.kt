@@ -103,5 +103,4 @@ open class RpcWebSocketServer(
         val LOG: Logger = LoggerFactory.getLogger(RpcWebSocketServer::class.java)
     }
 
-
 }

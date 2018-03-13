@@ -41,10 +41,13 @@ open class RpcWebSocketClient(
     private val uri = URI("ws://$host:$port")
     private val ws = WebSocketClientImpl().apply {  connectBlocking() }
 
+    override fun close() {
+        ws.closeBlocking()
+    }
 
-    override fun close() = ws.closeBlocking()
-
-    override fun write(msg: String) = ws.send(msg)
+    override fun write(msg: String) {
+        ws.send(msg)
+    }
 
     inner class WebSocketClientImpl: WebSocketClient(uri) {
 
