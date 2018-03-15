@@ -24,7 +24,7 @@
 
 package info.laht.yaj_rpc.net.ws
 
-import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
+import info.laht.yaj_rpc.net.AbstractRpcClient
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import org.slf4j.Logger
@@ -36,7 +36,7 @@ import java.net.URI
 open class RpcWebSocketClient(
         host: String,
         port: Int
-): AbstractAsyncRpcClient() {
+): AbstractRpcClient() {
 
     private val uri = URI("ws://$host:$port")
     private val ws = WebSocketClientImpl().apply {  connectBlocking() }

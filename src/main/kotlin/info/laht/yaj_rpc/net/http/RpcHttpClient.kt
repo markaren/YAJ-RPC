@@ -25,6 +25,7 @@
 package info.laht.yaj_rpc.net.http
 
 import info.laht.yaj_rpc.net.AbstractRpcClient
+import info.laht.yaj_rpc.net.Consumer
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
@@ -39,8 +40,7 @@ class RpcHttpClient(
 
     private val url = "http://$host:$port/jsonrpc"
 
-    override fun write(msg: String): String {
-
+    private fun connect(msg: String): String {
         val con = (URL(url).openConnection() as HttpURLConnection).apply {
             setRequestProperty("Content-Type", "application/json-rpc")
             requestMethod = "POST"
@@ -51,7 +51,6 @@ class RpcHttpClient(
             }
             connect()
         }
-
         return StringBuilder().apply {
             BufferedReader(InputStreamReader(con.inputStream)).use {
                 while (true) {
@@ -59,7 +58,10 @@ class RpcHttpClient(
                 }
             }
         }.toString()
+    }
 
+    override fun write(msg: String) {
+       messageReceived( connect(msg))
     }
 
     /**

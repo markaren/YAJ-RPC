@@ -39,6 +39,12 @@ class RpcHandler private constructor(
     constructor(vararg services:RpcService): this(services.associateBy { it.name })
     constructor(services: List<RpcService>): this(services.associateBy { it.name })
 
+    init {
+        if (services.isEmpty()) {
+            throw IllegalArgumentException("No services provided!")
+        }
+    }
+
     fun getOpenMessage(): String {
         return services.entries.associate {
             it.key to RpcService.getCallDescription(it.value)

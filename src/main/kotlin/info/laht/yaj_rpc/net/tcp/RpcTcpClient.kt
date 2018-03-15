@@ -25,7 +25,7 @@
 package info.laht.yaj_rpc.net.tcp
 
 
-import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
+import info.laht.yaj_rpc.net.AbstractRpcClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.BufferedInputStream
@@ -38,7 +38,7 @@ import java.nio.ByteBuffer
 open class RpcTcpClient(
         host: String,
         port: Int
-): AbstractAsyncRpcClient() {
+): AbstractRpcClient() {
 
     private val socket: Socket = Socket(host, port)
     private val `in` = BufferedInputStream(socket.getInputStream())

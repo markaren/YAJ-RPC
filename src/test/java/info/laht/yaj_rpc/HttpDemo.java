@@ -7,10 +7,11 @@ import info.laht.yaj_rpc.net.http.RpcHttpServer;
 
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
 
 public class HttpDemo {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, TimeoutException {
 
         RpcHandler handler = new RpcHandler(new SampleService());
 
@@ -19,21 +20,27 @@ public class HttpDemo {
 
         AbstractRpcClient client = new RpcHttpClient("localhost", port);
 
-        client.notify("SampleService.returnNothing", RpcParams.noParams());
+       try {
 
-        RpcParams params = RpcParams.listParams("Clint Eastwood");
-        RpcResponse response = client.write("SampleService.greet", params);
-        String result = response.getResult(String.class); //prints 'Hello Client Eastwood!'
-        System.out.println("Response=" + result);
+           client.notify("SampleService.returnNothing");
 
-        System.out.println("Press any key to exit..");
-        Scanner sc = new Scanner(System.in);
-        if (sc.hasNext()) {
-            System.out.println("exiting..");
-        }
+           RpcParams params = RpcParams.listParams("Clint Eastwood");
+           RpcResponse response = client.write("SampleService.greet", params);
+           String result = response.getResult(String.class); //prints 'Hello Client Eastwood!'
+           System.out.println("Response=" + result);
 
-        client.close();
-        server.close();
+           System.out.println("Press any key to exit..");
+           Scanner sc = new Scanner(System.in);
+           if (sc.hasNext()) {
+               System.out.println("exiting..");
+           }
+
+       } finally {
+
+           client.close();
+           server.close();
+
+       }
 
     }
 
