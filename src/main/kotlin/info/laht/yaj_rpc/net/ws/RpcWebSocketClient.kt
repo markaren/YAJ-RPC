@@ -45,7 +45,7 @@ open class RpcWebSocketClient(
         ws.closeBlocking()
     }
 
-    override fun write(msg: String) {
+    override fun internalWrite(msg: String) {
         ws.send(msg)
     }
 

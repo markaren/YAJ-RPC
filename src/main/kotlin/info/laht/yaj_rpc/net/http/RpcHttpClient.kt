@@ -60,7 +60,7 @@ class RpcHttpClient(
         }.toString()
     }
 
-    override fun write(msg: String) {
+    override fun internalWrite(msg: String) {
        messageReceived( connect(msg))
     }
 

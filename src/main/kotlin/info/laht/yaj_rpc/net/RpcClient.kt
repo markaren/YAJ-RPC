@@ -43,21 +43,29 @@ typealias Consumer<T> = (T) -> Unit
 interface RpcClient: Closeable {
 
 
-    fun notify(methodName: String, params: RpcParams)
-
     fun notify(methodName: String) {
         notify(methodName, RpcParams.noParams())
     }
 
+    fun notify(methodName: String, params: RpcParams)
+
     @Throws(TimeoutException::class)
-    fun write(methodName: String, params: RpcParams, timeOut: Long = DEFAULT_TIME_OUT): RpcResponse
+    fun write(methodName: String): RpcResponse {
+        return write(methodName, RpcParams.noParams(), DEFAULT_TIME_OUT)
+    }
 
     @Throws(TimeoutException::class)
     fun write(methodName: String, params: RpcParams): RpcResponse {
         return write(methodName, params, DEFAULT_TIME_OUT)
     }
 
+    @Throws(TimeoutException::class)
+    fun write(methodName: String, params: RpcParams, timeOut: Long = DEFAULT_TIME_OUT): RpcResponse
+
     fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>)
+    fun writeAsync(methodName: String, callback: Consumer<RpcResponse>) {
+        writeAsync(methodName, RpcParams.noParams(), callback)
+    }
 
 }
 
@@ -66,7 +74,7 @@ abstract class AbstractRpcClient : RpcClient  {
     private val callbacks = mutableMapOf<String, Consumer<RpcResponse>>()
 
     override fun notify(methodName: String, params: RpcParams) {
-        write(RpcRequestOut(methodName, params).let { it.toJson() })
+        internalWrite(RpcRequestOut(methodName, params).let { it.toJson() })
     }
 
     override fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>) {
@@ -74,7 +82,7 @@ abstract class AbstractRpcClient : RpcClient  {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = callback
         }.let { it.toJson() }
-        write(request)
+        internalWrite(request)
     }
 
 
@@ -90,7 +98,7 @@ abstract class AbstractRpcClient : RpcClient  {
                 latch.countDown()
             }
         }.let { it.toJson() }
-        write(request)
+        internalWrite(request)
         if (!latch.await(timeOut, TimeUnit.MILLISECONDS)) {
             throw TimeoutException("Timeout")
         }
@@ -98,7 +106,7 @@ abstract class AbstractRpcClient : RpcClient  {
 
     }
 
-    protected abstract fun write(msg: String)
+    protected abstract fun internalWrite(msg: String)
 
     protected fun messageReceived(message: String) {
         val response = RpcResponse.fromJson(message)

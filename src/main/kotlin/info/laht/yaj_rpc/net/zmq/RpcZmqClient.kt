@@ -39,7 +39,7 @@ class RpcZmqClient(
         connect("tcp://$host:$port")
     }
 
-    override fun write(msg: String) {
+    override fun internalWrite(msg: String) {
         socket.send(msg, 0)
         socket.recv(0).let {
             messageReceived(String(it, ZMQ.CHARSET) )
