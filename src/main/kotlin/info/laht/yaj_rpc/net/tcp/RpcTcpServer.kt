@@ -68,7 +68,7 @@ open class RpcTcpServer(
                     }
                 }
 
-                LOG.debug("${javaClass.simpleName} stopped!")
+                LOG.info("${javaClass.simpleName} stopped!")
 
             }.start()
         } else {

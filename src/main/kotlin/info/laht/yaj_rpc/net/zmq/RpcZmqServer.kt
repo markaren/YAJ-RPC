@@ -43,7 +43,7 @@ open class RpcZmqServer(
                         LOG.trace("Caught exception", ex)
                     }
 
-                    LOG.debug("${javaClass.simpleName} stopped!")
+                    LOG.info("${javaClass.simpleName} stopped!")
 
                 }.start()
 

@@ -60,7 +60,7 @@ open class RpcWebSocketServer(
             clients.forEach { it.close() }
             it.stop()
             ws = null
-            LOG.debug("${javaClass.simpleName} stopped!")
+            LOG.info("${javaClass.simpleName} stopped!")
         }
     }
 
