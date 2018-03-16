@@ -52,7 +52,12 @@ interface RpcServer: Closeable {
      */
     fun stop()
 
-    override fun close() = stop()
+    /**
+     * Same as stop()
+     */
+    override fun close() {
+        stop()
+    }
 
     companion object {
 

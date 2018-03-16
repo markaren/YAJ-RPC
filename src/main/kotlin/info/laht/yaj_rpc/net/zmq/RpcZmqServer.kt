@@ -37,16 +37,19 @@ open class RpcZmqServer(
 
     override var port: Int? = null
 
-    private var ctx: ZContext? = null
+    private val ctx: ZContext by lazy {
+        ZContext(1)
+    }
     private var socket: ZMQ.Socket? = null
 
+    val isRunning: Boolean
+        get() = socket != null
 
     override fun start(port: Int) {
 
-        if (socket == null) {
+        if (!isRunning) {
 
             this.port = port
-            ctx = ZContext(1)
             socket = ctx!!.createSocket(ZMQ.REP).also {socket ->
 
                 socket.bind("tcp://*:$port")
@@ -83,14 +86,13 @@ open class RpcZmqServer(
     }
 
     override fun stop() {
-        socket?.apply {
-            close()
+
+        if (isRunning) {
+            socket!!.close()
             socket = null
+            ctx.close()
         }
-        ctx?.apply {
-            close()
-            ctx = null
-        }
+
     }
 
     companion object {
