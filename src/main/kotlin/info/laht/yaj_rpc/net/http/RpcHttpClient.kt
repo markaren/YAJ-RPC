@@ -25,7 +25,6 @@
 package info.laht.yaj_rpc.net.http
 
 import info.laht.yaj_rpc.net.AbstractRpcClient
-import info.laht.yaj_rpc.net.Consumer
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection

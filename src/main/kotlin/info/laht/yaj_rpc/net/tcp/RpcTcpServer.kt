@@ -26,18 +26,14 @@ package info.laht.yaj_rpc.net.tcp
 
 import info.laht.yaj_rpc.RpcHandler
 import info.laht.yaj_rpc.net.RpcServer
-
-import java.io.IOException
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-
-import java.net.ServerSocket
-import java.net.Socket
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.IOException
+import java.net.ServerSocket
+import java.net.Socket
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 
 open class RpcTcpServer(

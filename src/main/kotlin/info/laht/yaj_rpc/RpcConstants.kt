@@ -24,23 +24,23 @@
 
 package info.laht.yaj_rpc
 
-val JSON_RPC_VERSION = "2.0"
-val JSON_RPC_IDENTIFIER = "jsonrpc"
-val METHOD_KEY = "method"
-val PARAMS_KEY = "params"
-val ID_KEY = "id"
+const val JSON_RPC_VERSION = "2.0"
+const val JSON_RPC_IDENTIFIER = "jsonrpc"
+const val METHOD_KEY = "method"
+const val PARAMS_KEY = "params"
+const val ID_KEY = "id"
 
-val DATA_KEY = "data"
-val MESSAGE_KEY = "message"
-val METHOD_NOT_FOUND_KEY = "method not found"
-val PARSE_ERROR_KEY = "parse error"
-val INVALID_REQUEST_KEY = "invalid request"
-val CODE_KEY = "code"
-val ERROR_KEY = "error"
-val RESULT_KEY = "result"
+const val DATA_KEY = "data"
+const val MESSAGE_KEY = "message"
+const val METHOD_NOT_FOUND_KEY = "method not found"
+const val PARSE_ERROR_KEY = "parse error"
+const val INVALID_REQUEST_KEY = "invalid request"
+const val CODE_KEY = "code"
+const val ERROR_KEY = "error"
+const val RESULT_KEY = "result"
 
 val NO_ID = Any()
 
-val METHOD_NOT_FOUND_CODE = -32601
-val PARSE_ERROR_CODE = -32700
-val INVALID_REQUEST_CODE = -32600
+const val METHOD_NOT_FOUND_CODE = -32601
+const val PARSE_ERROR_CODE = -32700
+const val INVALID_REQUEST_CODE = -32600
