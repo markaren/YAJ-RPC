@@ -12,7 +12,7 @@ buildscript {
 def snapshot = true
 
 group 'info.laht'
-version '0.5'
+version '0.6'
 
 if (snapshot) {
     version += '-SNAPSHOT'
@@ -25,6 +25,10 @@ apply plugin: 'signing'
 
 repositories {
     mavenCentral()
+}
+
+wrapper {
+    gradleVersion = '4.6'
 }
 
 dependencies {

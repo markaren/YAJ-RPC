@@ -99,6 +99,7 @@ class RpcHandler private constructor(
             return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
         }
         val params = req.params
+        @Suppress("UNCHECKED_CAST")
         return when(params) {
             RpcNoParams -> handleNoParams(service, method, id, req.isNotification)
             is RpcListParams<*> -> handleListParams(service, method, params.value as List<JsonElement>, id, req.isNotification)

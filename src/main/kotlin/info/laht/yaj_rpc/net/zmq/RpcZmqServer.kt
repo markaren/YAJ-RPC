@@ -50,7 +50,7 @@ open class RpcZmqServer(
         if (!isRunning) {
 
             this.port = port
-            socket = ctx!!.createSocket(ZMQ.REP).also {socket ->
+            socket = ctx.createSocket(ZMQ.REP).also {socket ->
 
                 socket.bind("tcp://*:$port")
 
@@ -71,7 +71,6 @@ open class RpcZmqServer(
                         LOG.trace("Caught exception", ex)
                     }
 
-                    LOG.info("${javaClass.simpleName} stopped!")
 
                 }.start()
 
@@ -88,9 +87,11 @@ open class RpcZmqServer(
     override fun stop() {
 
         if (isRunning) {
+            LOG.debug("Stopping ${javaClass.simpleName} ...")
             socket!!.close()
             socket = null
             ctx.close()
+            LOG.info("${javaClass.simpleName} stopped!")
         }
 
     }
