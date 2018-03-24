@@ -25,8 +25,6 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.JsonElement
-import java.util.HashMap
-import java.util.UUID
 import java.lang.reflect.Method
 
 fun indexOf(parameterName: String, method: Method): Int {

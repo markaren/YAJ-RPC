@@ -39,8 +39,7 @@ class RpcHttpClient(
 
     private val url = "http://$host:$port/jsonrpc"
 
-    override fun write(msg: String): String {
-
+    private fun connect(msg: String): String {
         val con = (URL(url).openConnection() as HttpURLConnection).apply {
             setRequestProperty("Content-Type", "application/json-rpc")
             requestMethod = "POST"
@@ -51,7 +50,6 @@ class RpcHttpClient(
             }
             connect()
         }
-
         return StringBuilder().apply {
             BufferedReader(InputStreamReader(con.inputStream)).use {
                 while (true) {
@@ -59,7 +57,10 @@ class RpcHttpClient(
                 }
             }
         }.toString()
+    }
 
+    override fun internalWrite(msg: String) {
+       messageReceived( connect(msg))
     }
 
     /**

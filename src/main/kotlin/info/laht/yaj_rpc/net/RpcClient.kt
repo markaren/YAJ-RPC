@@ -24,74 +24,68 @@
 
 package info.laht.yaj_rpc.net
 
-import info.laht.yaj_rpc.RpcNoParams
 import info.laht.yaj_rpc.RpcParams
 import info.laht.yaj_rpc.RpcRequestOut
 import info.laht.yaj_rpc.RpcResponse
-
-import java.util.UUID
-import java.util.concurrent.CountDownLatch
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.Closeable
+import java.util.*
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 
-
+private const val DEFAULT_TIME_OUT: Long = 1000
 typealias Consumer<T> = (T) -> Unit
 
 interface RpcClient: Closeable {
 
-    fun notify(methodName: String, params: RpcParams = RpcParams.noParams())
-    fun write(methodName: String, params: RpcParams = RpcNoParams): RpcResponse
 
-}
+    fun notify(methodName: String) {
+        notify(methodName, RpcParams.noParams())
+    }
 
-interface AsyncClient: RpcClient {
+    fun notify(methodName: String, params: RpcParams)
 
-    fun writeAsync(methodName: String, params: RpcParams = RpcParams.noParams(), callback: Consumer<RpcResponse>)
+    @Throws(TimeoutException::class)
+    fun write(methodName: String): RpcResponse {
+        return write(methodName, RpcParams.noParams(), DEFAULT_TIME_OUT)
+    }
+
+    @Throws(TimeoutException::class)
+    fun write(methodName: String, params: RpcParams): RpcResponse {
+        return write(methodName, params, DEFAULT_TIME_OUT)
+    }
+
+    @Throws(TimeoutException::class)
+    fun write(methodName: String, params: RpcParams, timeOut: Long = DEFAULT_TIME_OUT): RpcResponse
+
+    fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>)
+    fun writeAsync(methodName: String, callback: Consumer<RpcResponse>) {
+        writeAsync(methodName, RpcParams.noParams(), callback)
+    }
 
 }
 
 abstract class AbstractRpcClient : RpcClient  {
 
-    override fun notify(methodName: String, params: RpcParams) {
-        write(RpcRequestOut(methodName, params).let { it.toJson() })
-    }
-
-    override fun write(methodName: String, params: RpcParams): RpcResponse {
-
-        val request = RpcRequestOut(methodName, params).apply {
-            id = UUID.randomUUID().toString()
-        }.let { it.toJson() }
-        return RpcResponse.fromJson(write(request))
-
-    }
-
-    protected abstract fun write(msg: String): String
-
-    private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(AbstractAsyncRpcClient::class.java)
-    }
-}
-
-abstract class AbstractAsyncRpcClient : AsyncClient  {
-
     private val callbacks = mutableMapOf<String, Consumer<RpcResponse>>()
 
     override fun notify(methodName: String, params: RpcParams) {
-        write(RpcRequestOut(methodName, params).let { it.toJson() })
+        internalWrite(RpcRequestOut(methodName, params).toJson())
     }
 
     override fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>) {
         val request = RpcRequestOut(methodName, params).apply {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = callback
-        }.let { it.toJson() }
-        write(request)
+        }.toJson()
+        internalWrite(request)
     }
 
 
-    override fun write(methodName: String, params: RpcParams): RpcResponse {
+    @Throws(TimeoutException::class)
+    override fun write(methodName: String, params: RpcParams, timeOut: Long): RpcResponse {
 
         var response: RpcResponse? = null
         val latch = CountDownLatch(1)
@@ -101,14 +95,16 @@ abstract class AbstractAsyncRpcClient : AsyncClient  {
                 response = it
                 latch.countDown()
             }
-        }.let { it.toJson() }
-        write(request)
-        latch.await()
+        }.toJson()
+        internalWrite(request)
+        if (!latch.await(timeOut, TimeUnit.MILLISECONDS)) {
+            throw TimeoutException("Timeout")
+        }
         return response!!
 
     }
 
-    protected abstract fun write(msg: String)
+    protected abstract fun internalWrite(msg: String)
 
     protected fun messageReceived(message: String) {
         val response = RpcResponse.fromJson(message)
@@ -124,7 +120,7 @@ abstract class AbstractAsyncRpcClient : AsyncClient  {
     }
 
     private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(AbstractAsyncRpcClient::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(AbstractRpcClient::class.java)
     }
 
 }

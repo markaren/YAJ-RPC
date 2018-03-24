@@ -1,51 +1,62 @@
 package info.laht.yaj_rpc
 
-import info.laht.yaj_rpc.net.AbstractAsyncRpcClient
+import info.laht.yaj_rpc.net.RpcClient
 import info.laht.yaj_rpc.net.RpcServer
 import info.laht.yaj_rpc.net.tcp.RpcTcpClient
 import info.laht.yaj_rpc.net.tcp.RpcTcpServer
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import java.net.ServerSocket
+import org.junit.*
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class TestTcp {
 
-    lateinit var server: RpcServer
-    lateinit var client: AbstractAsyncRpcClient
+   companion object {
 
-    @Before
-    fun setup() {
+       val LOG: Logger = LoggerFactory.getLogger(TestTcp::class.java)
 
-        val port = ServerSocket(0).use { it.localPort }
-        server = RpcTcpServer(RpcHandler(SampleService())).also {
-            it.start(port)
-        }
+       lateinit var server: RpcServer
+       lateinit var service: SampleService
+       lateinit var client: RpcClient
 
-        client = RpcTcpClient("localhost", port)
+       @JvmStatic
+       @BeforeClass
+       fun setup() {
 
-    }
+           service = SampleService()
+           server = RpcTcpServer(RpcHandler(service))
+           val port = server.start()
 
-    @After
-    fun tearDown() {
-        client.close()
-        server.stop()
-    }
+           client = RpcTcpClient("localhost", port)
+
+       }
+
+       @JvmStatic
+       @AfterClass
+       fun tearDown() {
+           client.close()
+           server.stop()
+       }
+
+   }
 
     @Test
     fun test1() {
 
+        client.notify("SampleService.returnNothing")
+        Thread.sleep(100)
+        Assert.assertTrue(service.returnNothingCalled)
+
         val latch = CountDownLatch(1)
         client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood"), {
-            println("Async response=${it.getResult(String::class.java)}")
+            LOG.info("Async response=${it.getResult(String::class.java)}")
             latch.countDown()
         })
         latch.await(1000, TimeUnit.MILLISECONDS)
 
         client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
-            println("Synchronous response=${it.getResult(String::class.java)}")
+            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
 
     }

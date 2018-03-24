@@ -2,8 +2,13 @@ package info.laht.yaj_rpc
 
 import com.google.gson.GsonBuilder
 import org.junit.Test
+import org.slf4j.LoggerFactory
 
 class TestService {
+
+    companion object {
+        val LOG = LoggerFactory.getLogger(TestService::class.java)
+    }
 
     val gson = GsonBuilder()
             .setPrettyPrinting()
@@ -15,11 +20,11 @@ class TestService {
 
         val handler = RpcHandler(SampleService())
 
-        println(handler.getOpenMessage())
+        LOG.info(handler.getOpenMessage())
 
-        println(gson.fromJson(handler.handle(json1), Map::class.java))
-        println(gson.fromJson(handler.handle(json2), Map::class.java))
-        println(gson.fromJson(handler.handle(json3), Map::class.java))
+        LOG.info("${gson.fromJson(handler.handle(json1), Map::class.java)}")
+        LOG.info("${gson.fromJson(handler.handle(json2), Map::class.java)}")
+        LOG.info("${gson.fromJson(handler.handle(json3), Map::class.java)}")
 
     }
 

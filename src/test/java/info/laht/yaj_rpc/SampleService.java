@@ -1,5 +1,6 @@
 package info.laht.yaj_rpc;
 
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -7,6 +8,9 @@ public class SampleService implements RpcService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleService.class);
 
+    public boolean returnNothingCalled = false;
+
+    @NotNull
     public String getName() {
         return SampleService.class.getSimpleName();
     }
@@ -19,6 +23,7 @@ public class SampleService implements RpcService {
 
     @RpcMethod
     public void returnNothing() {
+        returnNothingCalled = true;
         LOG.debug("method returnNothing called");
     }
 

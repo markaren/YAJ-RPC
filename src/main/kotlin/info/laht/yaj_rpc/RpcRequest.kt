@@ -25,7 +25,6 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.annotations.SerializedName
-import info.laht.yaj_rpc.parser.JsonParser
 
 /**
  * @author Lars Ivar Hatledal
@@ -43,7 +42,7 @@ interface RpcRequest {
     companion object {
 
         fun fromJson(json: String): RpcRequest {
-            return JsonParser.gson.fromJson(json, RpcRequestIn::class.java)
+            return YAJ_RPC.fromJson(json, RpcRequestIn::class.java)
         }
 
     }
@@ -62,7 +61,7 @@ class RpcRequestOut(
     var version = JSON_RPC_VERSION
 
     fun toJson(): String {
-        return JsonParser.gson.toJson(this)
+        return YAJ_RPC.toJson(this)
     }
 
 }

@@ -25,15 +25,25 @@
 package info.laht.yaj_rpc.net
 
 import java.io.Closeable
+import java.net.ServerSocket
 
 /**
  * @author Lars Ivar Hatledal
  */
 interface RpcServer: Closeable {
 
+    val port: Int?
+
     /**
-     * Start the server using the provided port number
-     * @param port the port number to use
+     * Start the server using some available port
+     * @return the port used
+     */
+    fun start(): Int
+            = getAvailablePort().also { start(it) }
+
+    /**
+     * Start the server using the provided port
+     * @param port the port to use
      */
     fun start(port: Int)
 
@@ -42,7 +52,22 @@ interface RpcServer: Closeable {
      */
     fun stop()
 
-    override fun close() = stop()
+    /**
+     * Same as stop()
+     */
+    override fun close() {
+        stop()
+    }
+
+    companion object {
+
+        /**
+         * Finds and returns an available port
+         */
+        private fun getAvailablePort()
+                = ServerSocket(0).use { it.localPort }
+
+    }
 
 }
 

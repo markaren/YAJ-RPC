@@ -26,32 +26,33 @@ package info.laht.yaj_rpc.net.tcp
 
 import info.laht.yaj_rpc.RpcHandler
 import info.laht.yaj_rpc.net.RpcServer
-
-import java.io.IOException
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
-
-import java.net.ServerSocket
-import java.net.Socket
-
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.io.BufferedInputStream
+import java.io.BufferedOutputStream
+import java.io.IOException
+import java.net.ServerSocket
+import java.net.Socket
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 
 
 open class RpcTcpServer(
-        val handler: RpcHandler
+        private val handler: RpcHandler
 ): RpcServer {
 
-    private var stop = false;
+    private var stop = false
+    override var port: Int? = null
     private var server: ServerSocket? = null
 
     override fun start(port: Int) {
+
         if (server == null) {
+            this.port = port
             server = ServerSocket(port)
-            LOG.info("TCP server listening for connections on port: $port")
-            Thread({
+            LOG.info("${javaClass.simpleName} listening for connections on port: $port")
+
+            Thread {
+
                 while(!stop) {
                     try {
                         val accept: Socket = server!!.accept()!!
@@ -59,19 +60,24 @@ open class RpcTcpServer(
                         val handler = ClientHandler(accept)
                         Thread(handler).start()
                     } catch (ex: IOException) {
-
+                        LOG.trace("Caught exception", ex)
                     }
                 }
-            }).start()
+
+                LOG.info("${javaClass.simpleName} stopped!")
+
+            }.start()
         } else {
-            LOG.warn("RpcTcpServer has already been started!")
+            LOG.warn("${javaClass.simpleName} is already running!")
         }
     }
 
     override fun stop() {
-        stop = true
-        server?.close()
-        LOG.debug("RpcTcpServer server stopped!")
+        server?.also {
+            stop = true
+            it.close()
+            server = null
+        }
     }
 
     inner class ClientHandler(
@@ -94,6 +100,7 @@ open class RpcTcpServer(
                     }.let { String(it).replace(0.toChar(), ' ').trim() }
 
                     if (msg.isNotEmpty()) {
+                        LOG.trace("Received: $msg")
                         handler.handle(msg)?.also {
                             write(it)
                         }
@@ -101,16 +108,18 @@ open class RpcTcpServer(
 
                 }
             } catch (ex: IOException) {
-               // LOG.error("Exception caught in TCP client handler thread", ex)
+                LOG.trace("Exception caught in TCP client handler thread", ex)
             }
         }
 
         private fun write(data: String) {
             val bytes = data.toByteArray()
             val len = bytes.size.let { (ByteBuffer.allocate(4).putInt(it).array()) }
-            out.write(len)
-            out.write(bytes)
-            out.flush()
+            out.apply {
+                write(len)
+                write(bytes)
+                flush()
+            }
         }
 
     }

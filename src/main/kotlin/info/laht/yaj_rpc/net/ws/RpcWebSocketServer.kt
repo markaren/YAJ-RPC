@@ -38,17 +38,20 @@ open class RpcWebSocketServer(
         private val handler: RpcHandler
 ): RpcServer {
 
+    override var port: Int? = null
+
     private val clients = mutableSetOf<WebSocket>()
     private var ws: WebSocketServerImpl? = null
 
     override fun start(port: Int) {
         if (ws == null) {
+            this.port = port
             ws = WebSocketServerImpl(port).also {
                 it.start()
-                LOG.info("WS server listening for connections on port: $port")
+                LOG.info("${javaClass.simpleName} listening for connections on port: $port")
             }
         } else {
-            LOG.warn("RpcWebSocketServer has already been started!")
+            LOG.warn("${javaClass.simpleName} is already running!")
         }
     }
 
@@ -56,6 +59,8 @@ open class RpcWebSocketServer(
         ws?.also {
             clients.forEach { it.close() }
             it.stop()
+            ws = null
+            LOG.info("${javaClass.simpleName} stopped!")
         }
     }
 
@@ -83,19 +88,19 @@ open class RpcWebSocketServer(
         }
 
         override fun onMessage(conn: WebSocket, message: String) {
+            LOG.trace("Received: $message")
             handler.handle(message)?.also {response ->
                 conn.send(response)
             }
         }
 
         override fun onError(conn: WebSocket?, ex: Exception) {
-            LOG.error("WS error", ex)
+            LOG.error("onError, conn=$conn", ex)
         }
     }
 
     companion object {
         val LOG: Logger = LoggerFactory.getLogger(RpcWebSocketServer::class.java)
     }
-
 
 }
