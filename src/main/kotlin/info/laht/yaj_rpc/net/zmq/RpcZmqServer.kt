@@ -74,8 +74,6 @@ open class RpcZmqServer(
                     ctx = null
                 }
 
-                LOG.info("${javaClass.simpleName} stopped!")
-
             }.apply {
                 start()
             }
@@ -91,9 +89,11 @@ open class RpcZmqServer(
     override fun stop() {
 
         if (thread != null) {
+            LOG.debug("Stopping ${javaClass.simpleName} ...")
             ctx?.destroy()
             thread?.join(1000)
             thread = null
+            LOG.info("${javaClass.simpleName} stopped!")
         }
 
     }
