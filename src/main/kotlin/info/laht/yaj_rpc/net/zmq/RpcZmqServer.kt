@@ -37,47 +37,50 @@ open class RpcZmqServer(
 
     override var port: Int? = null
 
-    private val ctx: ZContext by lazy {
-        ZContext(1)
-    }
-    private var socket: ZMQ.Socket? = null
-
-    val isRunning: Boolean
-        get() = socket != null
+    private var thread: Thread? = null
+    private var ctx: ZContext? = null
 
     override fun start(port: Int) {
 
-        if (!isRunning) {
+        if (thread == null) {
 
             this.port = port
-            socket = ctx!!.createSocket(ZMQ.REP).also {socket ->
 
-                socket.bind("tcp://*:$port")
-
-                Thread {
-
-                    try {
-                        while (true) {
-
-                            val received = String(socket.recv(0), ZMQ.CHARSET)
-                            LOG.trace(received)
-
-                            handler.handle(received)?.also {
-                                socket.send(it, 0)
-                            } ?: socket.send("", 0)
-
-                        }
-                    } catch (ex: Exception) {
-                        LOG.trace("Caught exception", ex)
-                    }
-
-                    LOG.info("${javaClass.simpleName} stopped!")
-
-                }.start()
-
-                LOG.info("${javaClass.simpleName} listening for connections on port: $port")
-
+            ctx = ZContext(1).also { }
+            val socket = ctx!!.createSocket(ZMQ.REP).apply {
+                bind("tcp://*:$port")
             }
+
+            thread = Thread {
+
+                try {
+                    while (!Thread.currentThread().isInterrupted) {
+
+                        val recv = socket.recv(0)
+                        recv ?: break
+
+                        val data = String(recv, ZMQ.CHARSET)
+                        LOG.trace(data)
+
+                        handler.handle(data)?.also {
+                            socket.send(it, 0)
+                        } ?: socket.send("", 0)
+
+                    }
+                } catch (ex: Exception) {
+                    LOG.trace("Caught exception", ex)
+                } finally {
+                    ctx!!.destroy()
+                    ctx = null
+                }
+
+                LOG.info("${javaClass.simpleName} stopped!")
+
+            }.apply {
+                start()
+            }
+
+            LOG.info("${javaClass.simpleName} listening for connections on port: $port")
 
         } else {
             LOG.warn("${javaClass.simpleName} is already running!")
@@ -87,10 +90,10 @@ open class RpcZmqServer(
 
     override fun stop() {
 
-        if (isRunning) {
-            socket!!.close()
-            socket = null
-            ctx.close()
+        if (thread != null) {
+            ctx?.destroy()
+            thread?.join(1000)
+            thread = null
         }
 
     }
