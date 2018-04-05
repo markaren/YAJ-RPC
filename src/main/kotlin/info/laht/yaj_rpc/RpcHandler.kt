@@ -25,9 +25,9 @@
 package info.laht.yaj_rpc
 
 import com.google.gson.JsonElement
-import java.lang.reflect.Method
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.reflect.Method
 
 /**
  * @author Lars Ivar Hatledal
@@ -75,6 +75,7 @@ class RpcHandler private constructor(
         return handle(req)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun handle(req: RpcRequest): String? {
         val id = req.id
         val split = req.methodName!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
