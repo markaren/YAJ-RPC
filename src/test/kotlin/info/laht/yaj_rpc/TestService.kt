@@ -1,19 +1,23 @@
 package info.laht.yaj_rpc
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.junit.Test
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class TestService {
 
     companion object {
-        val LOG = LoggerFactory.getLogger(TestService::class.java)
-    }
 
-    val gson = GsonBuilder()
-            .setPrettyPrinting()
-            .serializeNulls()
-            .create()
+        val LOG: Logger = LoggerFactory.getLogger(TestService::class.java)
+
+        val gson: Gson = GsonBuilder()
+                .setPrettyPrinting()
+                .serializeNulls()
+                .create()
+
+    }
 
     @Test
     fun testService() {
@@ -28,7 +32,7 @@ class TestService {
 
     }
 
-    val json1 = """
+    private val json1 = """
             {
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -37,7 +41,7 @@ class TestService {
             }
             """
 
-    val json2 = """
+    private val json2 = """
             {
                 "jsonrpc": "2.0",
                 "id": 1,
@@ -46,7 +50,7 @@ class TestService {
             }
             """
 
-    val json3 = """
+    private val json3 = """
             {
                 "jsonrpc": "2.0",
                 "id": 5,

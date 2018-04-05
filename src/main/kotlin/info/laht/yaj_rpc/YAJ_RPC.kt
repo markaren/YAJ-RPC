@@ -27,9 +27,9 @@ package info.laht.yaj_rpc
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
-import java.lang.reflect.Type
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import java.lang.reflect.Type
 
 /**
  *
@@ -43,7 +43,7 @@ object YAJ_RPC {
             .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
             .serializeNulls()
 
-    private val jsonParser: Gson by lazy {
+    val jsonParser: Gson by lazy {
         builder.create()
     }
 
@@ -53,7 +53,9 @@ object YAJ_RPC {
 
     internal fun <T> fromJson(json: JsonElement, type: Class<T>) = jsonParser.fromJson(json, type)
 
-    fun <T> fromJson(json: String, type: Class<T>) = jsonParser.fromJson(json, type)
+    fun <T> fromJson(json: String, type: Class<T>): T = jsonParser.fromJson(json, type)
+
+    inline fun <reified T> String.fromJson(): T = jsonParser.fromJson(this, T::class.java)
 
     @JvmStatic
     fun registerTypeAdapter(type: Type, typeAdapter: Any) {
