@@ -58,6 +58,7 @@ compileKotlin {
         freeCompilerArgs = ['-Xenable-jvm-default']
     }
 }
+
 compileTestKotlin {
     kotlinOptions {
         jvmTarget = "1.8"
