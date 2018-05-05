@@ -16,10 +16,10 @@ wrapper {
     gradleVersion = '4.6'
 }
 
-def snapshot = false
+def snapshot = true
 
 group 'info.laht'
-version '0.6'
+version '0.7'
 
 if (snapshot) {
     version += '-SNAPSHOT'
