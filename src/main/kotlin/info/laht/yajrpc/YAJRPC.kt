@@ -31,13 +31,36 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.lang.reflect.Type
 
+const val JSON_RPC_VERSION = "2.0"
+const val JSON_RPC_IDENTIFIER = "jsonrpc"
+const val METHOD_KEY = "method"
+const val PARAMS_KEY = "params"
+const val ID_KEY = "id"
+
+const val DATA_KEY = "data"
+const val MESSAGE_KEY = "message"
+const val METHOD_NOT_FOUND_KEY = "method not found"
+const val PARSE_ERROR_KEY = "parse error"
+const val INVALID_REQUEST_KEY = "invalid request"
+const val CODE_KEY = "code"
+const val ERROR_KEY = "error"
+const val RESULT_KEY = "result"
+
+val NO_ID = Unit
+
+const val METHOD_NOT_FOUND_CODE = -32601
+const val PARSE_ERROR_CODE = -32700
+const val INVALID_REQUEST_CODE = -32600
+const val INVALID_PARAMS_CODE = -32602
+const val INTERNAL_ERROR_CODE = -32603
+
 /**
  *
  * @author Lars Ivar Hatledal
  */
-object YAJ_RPC {
+object YAJRPC {
 
-    private val LOG: Logger = LoggerFactory.getLogger(YAJ_RPC::class.java)
+    private val LOG: Logger = LoggerFactory.getLogger(YAJRPC::class.java)
 
     private val builder = GsonBuilder()
             .registerTypeAdapter(RpcParams::class.java, RpcParamsTypeAdapter())
@@ -55,7 +78,7 @@ object YAJ_RPC {
 
     fun <T> fromJson(json: String, type: Class<T>): T = jsonParser.fromJson(json, type)
 
-    inline fun <reified T> String.fromJson(): T = jsonParser.fromJson(this, T::class.java)
+    inline fun <reified T> fromJson(json: String): T = jsonParser.fromJson(json, T::class.java)
 
     @JvmStatic
     fun registerTypeAdapter(type: Type, typeAdapter: Any) {
@@ -64,3 +87,5 @@ object YAJ_RPC {
     }
 
 }
+
+

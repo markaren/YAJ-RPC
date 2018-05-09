@@ -27,18 +27,21 @@ package info.laht.yajrpc
 import com.google.gson.JsonElement
 import java.lang.reflect.Method
 
-fun indexOf(parameterName: String, method: Method): Int {
-    for (i in method.parameters.indices) {
-        val p = method.parameters[i]
+internal fun Method.indexOf(parameterName: String, throwOnError: Boolean = false): Int {
+    for (i in parameters.indices) {
+        val p = parameters[i]
         if (p.name == parameterName) {
             return i
         }
     }
+    if (throwOnError) {
+        throw NoSuchElementException("No parameter named '$parameterName' in method: ${this}")
+    }
     return -1
 }
 
-fun getValueByIndex(index: Int, map: Map<String, JsonElement>): JsonElement {
-    for ((i, value) in map.values.withIndex()) {
+fun Map<String, JsonElement>.getValueByIndex(index: Int): JsonElement {
+    for ((i, value) in values.withIndex()) {
         if (i == index) {
             return value
         }

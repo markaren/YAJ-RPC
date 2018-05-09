@@ -31,7 +31,7 @@ import java.lang.reflect.Method
  */
 interface RpcService {
 
-    val name: String
+    val serviceName: String
 
     companion object {
 
@@ -47,7 +47,6 @@ interface RpcService {
                     }
                 }
             }
-
             return map[service]!!
         }
 

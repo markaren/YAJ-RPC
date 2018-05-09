@@ -84,8 +84,8 @@ class RpcParamsTypeAdapter : JsonDeserializer<RpcParams>, JsonSerializer<RpcPara
 
         return when (src) {
             RpcNoParams -> null
-            is RpcListParams<*> -> YAJ_RPC.toJsonTree(src.value)
-            is RpcMapParams<*> -> YAJ_RPC.toJsonTree(src.value)
+            is RpcListParams<*> -> YAJRPC.toJsonTree(src.value)
+            is RpcMapParams<*> -> YAJRPC.toJsonTree(src.value)
         }
 
     }

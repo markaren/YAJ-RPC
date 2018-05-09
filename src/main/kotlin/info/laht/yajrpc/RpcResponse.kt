@@ -27,35 +27,25 @@ package info.laht.yajrpc
 import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
-interface RpcResponse {
-
-    val id: Any
-    val version: String?
-    val error: RpcError?
-
-    fun <T> getResult(clazz: Class<T>): T?
-
-    companion object {
-
-        fun fromJson(json: String): RpcResponse {
-            return YAJ_RPC.fromJson(json, RpcResponseImpl::class.java)
-        }
-
-    }
-
-}
-
 /**
  *
  * @author Lars Ivar Hatledal
  */
-class RpcResponseImpl internal constructor() : RpcResponse {
+class RpcResponse internal constructor() {
+
+    companion object {
+
+        fun fromJson(json: String): RpcResponse {
+            return YAJRPC.fromJson(json, RpcResponse::class.java)
+        }
+
+    }
 
     @SerializedName(JSON_RPC_IDENTIFIER)
-    override val version: String? = null
+    val version: String? = null
 
-    override val id: Any = NO_ID
-    override val error: RpcError? = null
+    val id: Any = NO_ID
+    val error: RpcError? = null
     private val result: String? = null
 
     val isVoid: Boolean
@@ -67,7 +57,11 @@ class RpcResponseImpl internal constructor() : RpcResponse {
     val hasResult: Boolean
         get() = !hasError
 
-    override fun <T> getResult(clazz: Class<T>): T? {
+    inline fun <reified T> getResult(): T? {
+        return getResult(T::class.java)
+    }
+
+    fun <T> getResult(clazz: Class<T>): T? {
         return if (hasResult) {
             Gson().fromJson(result, clazz)
         } else null

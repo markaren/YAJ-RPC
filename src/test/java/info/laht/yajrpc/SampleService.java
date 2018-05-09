@@ -11,7 +11,7 @@ public class SampleService implements RpcService {
     public boolean returnNothingCalled = false;
 
     @NotNull
-    public String getName() {
+    public String getServiceName() {
         return SampleService.class.getSimpleName();
     }
 

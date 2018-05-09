@@ -36,8 +36,8 @@ class RpcHandler private constructor(
         private val services: Map<String, RpcService>
 ) {
 
-    constructor(vararg services: RpcService) : this(services.associateBy { it.name })
-    constructor(services: List<RpcService>) : this(services.associateBy { it.name })
+    constructor(vararg services: RpcService) : this(services.associateBy { it.serviceName })
+    constructor(services: List<RpcService>) : this(services.associateBy { it.serviceName })
 
     init {
         if (services.isEmpty()) {
@@ -48,7 +48,7 @@ class RpcHandler private constructor(
     fun getOpenMessage(): String {
         return services.entries.associate {
             it.key to RpcService.getCallDescription(it.value)
-        }.let { YAJ_RPC.toJson(it) }
+        }.let { YAJRPC.toJson(it) }
     }
 
     fun handle(json: String): String? {
@@ -159,15 +159,16 @@ class RpcHandler private constructor(
             LOG.error(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, msg)
         }
-        val collect = params.keys.map({ key -> indexOf(key, method) })
+        val collect = params.keys.map({ key -> method.indexOf(key) })
         if (collect.contains(-1)) {
             val parameterNames = method.parameters.map { it.name }
             val msg = "mismatch between one or more parameter names and params keys, params: $params, parameterNames: $parameterNames"
             LOG.error(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, msg)
         }
-        val args = MutableList(params.size, { i -> getValueByIndex(collect[i], params) })
-        return handleListParams(service, method, args, id, isNotification)
+        return MutableList(params.size, { i -> params.getValueByIndex(collect[i]) }).let {
+            handleListParams(service, method, it, id, isNotification)
+        }
     }
 
     private fun toTypedParams(params: List<JsonElement>, types: Array<Class<*>>): List<Any> {
@@ -185,7 +186,7 @@ class RpcHandler private constructor(
                 Int::class.java, Int::class.javaPrimitiveType -> param.asInt
                 Float::class.java, Float::class.javaPrimitiveType -> param.asFloat
                 Double::class.java, Double::class.javaPrimitiveType -> param.asDouble
-                else -> YAJ_RPC.fromJson(param, arg)
+                else -> YAJRPC.fromJson(param, arg)
             }
         })
 
@@ -205,15 +206,15 @@ class RpcHandler private constructor(
                 it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
                 it[ERROR_KEY] = errorType.toMap(data)
                 it[ID_KEY] = id
-            }.let { YAJ_RPC.toJson(it) }
+            }.let { YAJRPC.toJson(it) }
         }
 
         fun createResponse(result: Any?, id: Any): String {
             return mutableMapOf<String, Any>().also {
                 it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
-                it[RESULT_KEY] = YAJ_RPC.toJson(result)
+                it[RESULT_KEY] = YAJRPC.toJson(result)
                 it[ID_KEY] = id
-            }.let { YAJ_RPC.toJson(it) }
+            }.let { YAJRPC.toJson(it) }
         }
 
     }

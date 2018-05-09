@@ -2,6 +2,7 @@ package info.laht.yajrpc
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import org.junit.Assert
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -26,9 +27,24 @@ class TestService {
 
         LOG.info(handler.getOpenMessage())
 
-        LOG.info("${gson.fromJson(handler.handle(json1), Map::class.java)}")
-        LOG.info("${gson.fromJson(handler.handle(json2), Map::class.java)}")
-        LOG.info("${gson.fromJson(handler.handle(json3), Map::class.java)}")
+        handler.handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            LOG.info("$it")
+            Assert.assertEquals(20.0, it.getResult<Double>()!!, 0.0)
+        }
+
+        handler.handle(json2).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            LOG.info("$it")
+            val result = it.getResult<SampleService.MyClass>()!!
+            Assert.assertEquals(1, result.i)
+            Assert.assertEquals(4.0, result.d, 0.0)
+            Assert.assertEquals("per", result.s)
+        }
+
+        handler.handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            LOG.info("$it")
+            Assert.assertNull(it.getResult())
+        }
+
 
     }
 

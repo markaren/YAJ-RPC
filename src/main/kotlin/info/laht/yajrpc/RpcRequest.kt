@@ -39,13 +39,10 @@ interface RpcRequest {
     val isNotification
         get() = id == NO_ID
 
-
     companion object {
-
-        fun fromJson(json: String): RpcRequest {
-            return YAJ_RPC.fromJson(json, RpcRequestIn::class.java)
+        internal fun fromJson(json: String): RpcRequest {
+            return YAJRPC.fromJson<RpcRequestIn>(json)
         }
-
     }
 
 }
@@ -62,7 +59,7 @@ class RpcRequestOut(
     var version = JSON_RPC_VERSION
 
     fun toJson(): String {
-        return YAJ_RPC.toJson(this)
+        return YAJRPC.toJson(this)
     }
 
 }
