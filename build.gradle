@@ -16,7 +16,7 @@ wrapper {
     gradleVersion = '4.6'
 }
 
-def snapshot = true
+def snapshot = false
 
 group 'info.laht'
 version '0.7'
