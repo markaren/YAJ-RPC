@@ -2,37 +2,56 @@ package info.laht.yajrpc
 
 import info.laht.yajrpc.net.RpcClient
 import info.laht.yajrpc.net.RpcServer
-import org.junit.AfterClass
-import org.junit.Assert
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractTestServer {
 
     companion object {
 
-        val LOG: Logger = LoggerFactory.getLogger(AbstractTestServer::class.java)
-
-        lateinit var server: RpcServer
-        lateinit var service: SampleService
-        lateinit var client: RpcClient
-
-        @JvmStatic
-        @AfterClass
-        fun tearDown() {
-            client.close()
-            server.stop()
-        }
+        private val LOG: Logger = LoggerFactory.getLogger(AbstractTestServer::class.java)
 
     }
 
+    val server: RpcServer
+    val client: RpcClient
+    val service: SampleService
+
+    init {
+
+        service = SampleService()
+        server = createServer()
+        val port = server.start()
+
+        client = createClient(port)
+    }
+
+    @AfterAll
+    fun tearDown() {
+
+        LOG.info("TearDown")
+
+        client.close()
+        server.stop()
+
+    }
+
+    abstract fun createServer(): RpcServer
+    abstract fun createClient(port: Int): RpcClient
+
+    @Test
     fun run() {
 
         client.notify("SampleService.returnNothing")
         Thread.sleep(100)
-        Assert.assertTrue(service.returnNothingCalled)
+        Assertions.assertTrue(service.returnNothingCalled)
 
         val latch = CountDownLatch(1)
         client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood"), {

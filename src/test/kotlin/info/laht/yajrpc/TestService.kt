@@ -1,9 +1,7 @@
 package info.laht.yajrpc
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import org.junit.Assert
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -12,11 +10,6 @@ class TestService {
     companion object {
 
         private val LOG: Logger = LoggerFactory.getLogger(TestService::class.java)
-
-        private val gson: Gson = GsonBuilder()
-                .setPrettyPrinting()
-                .serializeNulls()
-                .create()
 
     }
 
@@ -29,22 +22,21 @@ class TestService {
 
         handler.handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
             LOG.info("$it")
-            Assert.assertEquals(20.0, it.getResult<Double>()!!, 0.0)
+            Assertions.assertEquals(20.0, it.getResult<Double>()!!)
         }
 
         handler.handle(json2).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
             LOG.info("$it")
             val result = it.getResult<SampleService.MyClass>()!!
-            Assert.assertEquals(1, result.i)
-            Assert.assertEquals(4.0, result.d, 0.0)
-            Assert.assertEquals("per", result.s)
+            Assertions.assertEquals(1, result.i)
+            Assertions.assertEquals(4.0, result.d)
+            Assertions.assertEquals("per", result.s)
         }
 
         handler.handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
             LOG.info("$it")
-            Assert.assertNull(it.getResult())
+            Assertions.assertNull(it.getResult())
         }
-
 
     }
 
@@ -74,4 +66,5 @@ class TestService {
                 "$PARAMS_KEY": null
             }
             """
+
 }
