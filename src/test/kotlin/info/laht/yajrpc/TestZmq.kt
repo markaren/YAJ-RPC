@@ -1,31 +1,18 @@
 package info.laht.yajrpc
 
+import info.laht.yajrpc.net.RpcClient
+import info.laht.yajrpc.net.RpcServer
 import info.laht.yajrpc.net.zmq.RpcZmqClient
 import info.laht.yajrpc.net.zmq.RpcZmqServer
-import org.junit.BeforeClass
-import org.junit.Test
 
 class TestZmq : AbstractTestServer() {
 
-    companion object {
-
-        @JvmStatic
-        @BeforeClass
-        fun setup() {
-
-            service = SampleService()
-            server = RpcZmqServer(RpcHandler(service))
-            val port = server.start()
-
-            client = RpcZmqClient("localhost", port)
-
-        }
-
+    override fun createServer(): RpcServer {
+        return RpcZmqServer(RpcHandler(service))
     }
 
-    @Test
-    fun test() {
-        run()
+    override fun createClient(port: Int): RpcClient {
+        return RpcZmqClient("localhost", port)
     }
 
 }
