@@ -16,19 +16,9 @@ wrapper {
     gradleVersion = '4.7'
 }
 
-def snapshot = true
-
-group 'info.laht'
-version '0.7.1'
-
-if (snapshot) {
-    version += '-SNAPSHOT'
-}
 
 apply plugin: 'java-library'
 apply plugin: 'kotlin'
-apply plugin: 'maven'
-apply plugin: 'signing'
 
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -75,6 +65,18 @@ test {
 }
 
 if (hasProperty("ossrhUsername") && hasProperty("ossrhPassword")) {
+
+    def snapshot = false
+
+    group 'info.laht'
+    version '0.7.1'
+
+    if (snapshot) {
+        version += '-SNAPSHOT'
+    }
+
+    apply plugin: 'maven'
+    apply plugin: 'signing'
 
     task sourcesJar(type: Jar) {
         classifier = 'sources'
