@@ -66,10 +66,10 @@ test {
 
 if (hasProperty("ossrhUsername") && hasProperty("ossrhPassword")) {
 
-    def snapshot = false
+    def snapshot = true
 
     group 'info.laht'
-    version '0.7.1'
+    version '0.7.2'
 
     if (snapshot) {
         version += '-SNAPSHOT'
