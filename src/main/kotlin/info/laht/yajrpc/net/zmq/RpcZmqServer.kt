@@ -40,6 +40,7 @@ open class RpcZmqServer(
     private var thread: Thread? = null
     private var ctx: ZContext? = null
 
+    @Volatile
     private var stop = false
 
     override fun start(port: Int) {
@@ -56,21 +57,22 @@ open class RpcZmqServer(
             thread = Thread {
 
                 try {
-                    while (!stop && !Thread.currentThread().isInterrupted) {
+                    while (!stop) {
 
-                        val recv = socket.recv(0)
+                        val recv = socket.recv()
                         recv ?: break
 
                         val data = String(recv, ZMQ.CHARSET)
                         LOG.trace(data)
 
                         handler.handle(data)?.also {
-                            socket.send(it, 0)
-                        } ?: socket.send("", 0)
+                            socket.send(it)
+                        } ?: socket.send("")
 
                     }
                 } catch (ex: Exception) {
                     LOG.trace("Caught exception", ex)
+                    ctx = null
                 } finally {
                     ctx?.destroy()
                     ctx = null
@@ -94,7 +96,7 @@ open class RpcZmqServer(
             LOG.debug("Stopping ${javaClass.simpleName} ...")
             stop = true
             ctx?.destroy()
-            thread?.join(1000)
+            thread?.join()
             thread = null
             LOG.info("${javaClass.simpleName} stopped!")
         }

@@ -42,6 +42,7 @@ open class RpcTcpServer(
         private val handler: RpcHandler
 ) : RpcServer {
 
+    @Volatile
     private var stop = false
     override var port: Int? = null
     private var server: ServerSocket? = null
