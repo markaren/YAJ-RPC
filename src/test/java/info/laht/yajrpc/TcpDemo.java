@@ -1,6 +1,5 @@
 package info.laht.yajrpc;
 
-
 import info.laht.yajrpc.net.RpcClient;
 import info.laht.yajrpc.net.RpcServer;
 import info.laht.yajrpc.net.tcp.RpcTcpClient;

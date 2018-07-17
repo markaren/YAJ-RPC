@@ -32,7 +32,9 @@ import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.net.URI
 
-
+/**
+ * @author Lars Ivar Hatledal
+ */
 open class RpcWebSocketClient(
         host: String,
         port: Int

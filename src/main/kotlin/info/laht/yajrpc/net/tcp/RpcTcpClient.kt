@@ -24,7 +24,6 @@
 
 package info.laht.yajrpc.net.tcp
 
-
 import info.laht.yajrpc.net.AbstractRpcClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -33,7 +32,6 @@ import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.Socket
 import java.nio.ByteBuffer
-
 
 open class RpcTcpClient(
         host: String,

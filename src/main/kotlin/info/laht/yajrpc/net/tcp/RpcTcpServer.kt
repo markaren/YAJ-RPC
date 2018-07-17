@@ -35,7 +35,9 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.nio.ByteBuffer
 
-
+/**
+ * @author Lars Ivar Hatledal
+ */
 open class RpcTcpServer(
         private val handler: RpcHandler
 ) : RpcServer {

@@ -35,9 +35,12 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
 
-private const val DEFAULT_TIME_OUT: Long = 1000
+var DEFAULT_TIME_OUT: Long = 2000
 typealias Consumer<T> = (T) -> Unit
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 interface RpcClient : Closeable {
 
     @JvmDefault
@@ -51,6 +54,12 @@ interface RpcClient : Closeable {
     @Throws(TimeoutException::class)
     fun write(methodName: String): RpcResponse {
         return write(methodName, RpcParams.noParams(), DEFAULT_TIME_OUT)
+    }
+
+    @JvmDefault
+    @Throws(TimeoutException::class)
+    fun write(methodName: String, timeOut: Long = DEFAULT_TIME_OUT): RpcResponse {
+        return write(methodName, RpcParams.noParams(), timeOut)
     }
 
     @JvmDefault
@@ -71,6 +80,9 @@ interface RpcClient : Closeable {
 
 }
 
+/**
+ * @author Lars Ivar Hatledal
+ */
 abstract class AbstractRpcClient : RpcClient {
 
     private val callbacks = mutableMapOf<String, Consumer<RpcResponse>>()
@@ -124,7 +136,7 @@ abstract class AbstractRpcClient : RpcClient {
     }
 
     private companion object {
-        val LOG: Logger = LoggerFactory.getLogger(AbstractRpcClient::class.java)
+        private val LOG: Logger = LoggerFactory.getLogger(AbstractRpcClient::class.java)
     }
 
 }

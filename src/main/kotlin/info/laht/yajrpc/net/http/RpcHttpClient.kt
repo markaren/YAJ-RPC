@@ -31,7 +31,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.Charset
 
-
+/**
+ * @author Lars Ivar Hatledal
+ */
 class RpcHttpClient(
         host: String,
         port: Int

@@ -7,35 +7,35 @@ import org.slf4j.LoggerFactory
 
 class TestService {
 
-    companion object {
-
+    private companion object {
         private val LOG: Logger = LoggerFactory.getLogger(TestService::class.java)
-
     }
 
     @Test
     fun testService() {
 
-        val handler = RpcHandler(SampleService())
+        RpcHandler(SampleService()).apply {
 
-        LOG.info(handler.getOpenMessage())
+            LOG.info(getOpenMessage())
 
-        handler.handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-            LOG.info("$it")
-            Assertions.assertEquals(20.0, it.getResult<Double>()!!)
-        }
+            handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                Assertions.assertEquals(20.0, it.getResult<Double>()!!)
+            }
 
-        handler.handle(json2).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-            LOG.info("$it")
-            val result = it.getResult<SampleService.MyClass>()!!
-            Assertions.assertEquals(1, result.i)
-            Assertions.assertEquals(4.0, result.d)
-            Assertions.assertEquals("per", result.s)
-        }
+            handle(json2).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                val result = it.getResult<SampleService.MyClass>()!!
+                Assertions.assertEquals(1, result.i)
+                Assertions.assertEquals(4.0, result.d)
+                Assertions.assertEquals("per", result.s)
+            }
 
-        handler.handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-            LOG.info("$it")
-            Assertions.assertNull(it.getResult())
+            handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                Assertions.assertNull(it.getResult())
+            }
+
         }
 
     }

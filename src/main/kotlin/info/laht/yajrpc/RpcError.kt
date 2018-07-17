@@ -24,7 +24,6 @@
 
 package info.laht.yajrpc
 
-
 import java.util.*
 
 /**

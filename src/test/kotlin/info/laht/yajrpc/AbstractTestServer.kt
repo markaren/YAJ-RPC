@@ -14,10 +14,8 @@ import java.util.concurrent.TimeUnit
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractTestServer {
 
-    companion object {
-
+    private companion object {
         private val LOG: Logger = LoggerFactory.getLogger(AbstractTestServer::class.java)
-
     }
 
     val server: RpcServer
@@ -28,19 +26,13 @@ abstract class AbstractTestServer {
 
         service = SampleService()
         server = createServer()
-        val port = server.start()
-
-        client = createClient(port)
+        client = createClient(server.start())
     }
 
     @AfterAll
     fun tearDown() {
-
-        LOG.info("TearDown")
-
         client.close()
         server.stop()
-
     }
 
     abstract fun createServer(): RpcServer
@@ -54,10 +46,10 @@ abstract class AbstractTestServer {
         Assertions.assertTrue(service.returnNothingCalled)
 
         val latch = CountDownLatch(1)
-        client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood"), {
+        client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood")) {
             LOG.info("Async response=${it.getResult(String::class.java)}")
             latch.countDown()
-        })
+        }
         latch.await(1000, TimeUnit.MILLISECONDS)
 
         client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {

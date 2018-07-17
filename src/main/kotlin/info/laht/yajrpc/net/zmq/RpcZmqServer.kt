@@ -40,13 +40,15 @@ open class RpcZmqServer(
     private var thread: Thread? = null
     private var ctx: ZContext? = null
 
+    private var stop = false
+
     override fun start(port: Int) {
 
         if (thread == null) {
 
             this.port = port
 
-            ctx = ZContext(1).also { }
+            ctx = ZContext()
             val socket = ctx!!.createSocket(ZMQ.REP).apply {
                 bind("tcp://*:$port")
             }
@@ -54,7 +56,7 @@ open class RpcZmqServer(
             thread = Thread {
 
                 try {
-                    while (!Thread.currentThread().isInterrupted) {
+                    while (!stop && !Thread.currentThread().isInterrupted) {
 
                         val recv = socket.recv(0)
                         recv ?: break
@@ -70,7 +72,7 @@ open class RpcZmqServer(
                 } catch (ex: Exception) {
                     LOG.trace("Caught exception", ex)
                 } finally {
-                    ctx!!.destroy()
+                    ctx?.destroy()
                     ctx = null
                 }
 
@@ -90,6 +92,7 @@ open class RpcZmqServer(
 
         if (thread != null) {
             LOG.debug("Stopping ${javaClass.simpleName} ...")
+            stop = true
             ctx?.destroy()
             thread?.join(1000)
             thread = null
@@ -98,8 +101,8 @@ open class RpcZmqServer(
 
     }
 
-    companion object {
-        val LOG: Logger = LoggerFactory.getLogger(RpcZmqServer::class.java)
+    private companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(RpcZmqServer::class.java)
     }
 
 }

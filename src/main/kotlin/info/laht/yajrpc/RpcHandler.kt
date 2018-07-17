@@ -177,7 +177,7 @@ class RpcHandler private constructor(
             throw AssertionError("params.length != types.length")
         }
 
-        return List(types.size, { i ->
+        return List(types.size) { i ->
             val arg = types[i]
             val param = params[i]
             when (arg) {
@@ -188,14 +188,14 @@ class RpcHandler private constructor(
                 Double::class.java, Double::class.javaPrimitiveType -> param.asDouble
                 else -> YAJRPC.fromJson(param, arg)
             }
-        })
+        }
 
     }
 
 
     private companion object {
 
-        val LOG: Logger = LoggerFactory.getLogger(RpcHandler::class.java)
+        private val LOG: Logger = LoggerFactory.getLogger(RpcHandler::class.java)
 
         fun createErrorResponse(id: Any, errorType: RpcError.ErrorType): String {
             return createErrorResponse(id, errorType, null)

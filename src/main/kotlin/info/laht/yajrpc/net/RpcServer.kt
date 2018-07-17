@@ -64,17 +64,14 @@ interface RpcServer : Closeable {
         stop()
     }
 
-    companion object {
 
-        /**
-         * Finds and returns an available port
-         */
-        private fun getAvailablePort(): Int {
-            return ServerSocket(0).use {
-                it.localPort
-            }
+    /**
+     * Finds and returns an available port
+     */
+    fun getAvailablePort(): Int {
+        return ServerSocket(0).use {
+            it.localPort
         }
-
     }
 
 }

@@ -37,7 +37,9 @@ import java.net.InetSocketAddress
 import java.nio.charset.Charset
 import java.util.*
 
-
+/**
+ * @author Lars Ivar Hatledal
+ */
 abstract class SimpleHTTPServer {
 
     var port: Int? = null
@@ -85,10 +87,9 @@ abstract class SimpleHTTPServer {
         return result
     }
 
-    companion object {
+    private companion object {
         private val LOG: Logger = LoggerFactory.getLogger(SimpleHTTPServer::class.java)
     }
-
 
 }
 
