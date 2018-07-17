@@ -1,0 +1,10 @@
+
+apply plugin: 'kotlin'
+
+dependencies {
+    testCompile project(':yaj-rpc')
+    testCompile project(':yaj-rpc-ws')
+    testCompile project(':yaj-rpc-tcp')
+    testCompile project(':yaj-rpc-zmq')
+    testCompile project(':yaj-rpc-http')
+}

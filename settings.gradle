@@ -1,2 +1,9 @@
 rootProject.name = 'YAJ-RPC'
 
+include 'yaj-rpc'
+include 'yaj-rpc-ws'
+include 'yaj-rpc-zmq'
+include 'yaj-rpc-tcp'
+include 'yaj-rpc-http'
+include 'yaj-rpc-tests'
+

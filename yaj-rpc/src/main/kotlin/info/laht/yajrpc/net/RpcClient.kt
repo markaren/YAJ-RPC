@@ -88,14 +88,14 @@ abstract class AbstractRpcClient : RpcClient {
     private val callbacks = mutableMapOf<String, Consumer<RpcResponse>>()
 
     override fun notify(methodName: String, params: RpcParams) {
-        internalWrite(RpcRequestOut(methodName, params).let { it.toJson() })
+        internalWrite(RpcRequestOut(methodName, params).toJson())
     }
 
     override fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>) {
         val request = RpcRequestOut(methodName, params).apply {
             id = UUID.randomUUID().toString()
             callbacks[id.toString()] = callback
-        }.let { it.toJson() }
+        }.toJson()
         internalWrite(request)
     }
 
@@ -111,7 +111,7 @@ abstract class AbstractRpcClient : RpcClient {
                 response = it
                 latch.countDown()
             }
-        }.let { it.toJson() }
+        }.toJson()
         internalWrite(request)
         if (!latch.await(timeOut, TimeUnit.MILLISECONDS)) {
             throw TimeoutException("Timeout")

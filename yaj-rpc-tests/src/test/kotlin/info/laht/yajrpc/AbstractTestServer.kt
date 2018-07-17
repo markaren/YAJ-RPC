@@ -23,7 +23,6 @@ abstract class AbstractTestServer {
     val service: SampleService
 
     init {
-
         service = SampleService()
         server = createServer()
         client = createClient(server.start())

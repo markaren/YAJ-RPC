@@ -54,7 +54,7 @@ open class RpcTcpClient(
                 while (true) {
 
                     `in`.read(lenBuf)
-                    var len = ByteBuffer.wrap(lenBuf).int
+                    val len = ByteBuffer.wrap(lenBuf).int
                     val msg = ByteArray(len).also {
                         `in`.read(it, 0, len)
                     }.let { String(it) }
