@@ -72,7 +72,7 @@ subprojects { sub ->
         def snapshot = true
 
         group = 'info.laht'
-        version = '0.8'
+        version = '0.9'
 
         if (snapshot) {
             version += '-SNAPSHOT'
