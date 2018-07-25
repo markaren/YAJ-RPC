@@ -1,6 +1,8 @@
 
 apply plugin: 'kotlin'
 
+apply from: rootProject.file('publisher.gradle')
+
 dependencies {
     compile project(':yaj-rpc')
 }

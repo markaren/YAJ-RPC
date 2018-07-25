@@ -1,23 +1,9 @@
 
+plugins {
+    id "org.jetbrains.kotlin.jvm" version "1.2.51" apply false //apply in sub-projects
+}
+
 println "Gradle version is ${GradleVersion.current().version}"
-
-buildscript {
-    ext.kotlin_version = '1.2.51'
-
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
-wrapper {
-    gradleVersion = '4.9'
-}
-
-ext.hasOssrhUsername = hasProperty("ossrhUsername")
-ext.hasOssrhPassword = hasProperty("ossrhPassword")
 
 subprojects { sub ->
 
@@ -31,9 +17,9 @@ subprojects { sub ->
     def slf4j_version = "1.7.25"
 
     dependencies {
-    
+
         sub.plugins.withId('kotlin') {
-            compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+            compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
         }
 
         implementation group: 'org.slf4j', name: 'slf4j-api', version: "$slf4j_version"
@@ -67,85 +53,4 @@ subprojects { sub ->
 
     compileTestJava.options.compilerArgs.add '-parameters'
 
-    if (!sub.name.endsWith("tests") && hasOssrhUsername && hasOssrhPassword) {
-
-        def snapshot = true
-
-        group = 'info.laht'
-        version = '0.9'
-
-        if (snapshot) {
-            version += '-SNAPSHOT'
-        }
-
-        println("maven version for $archivesBaseName is: $version")
-
-        apply plugin: 'maven'
-        apply plugin: 'signing'
-
-        task sourcesJar(type: Jar) {
-            classifier = 'sources'
-            from sourceSets.main.allSource
-        }
-
-        task javadocJar(type: Jar) {
-            classifier = 'javadoc'
-            from javadoc
-        }
-
-        artifacts {
-            archives javadocJar, sourcesJar
-        }
-
-        signing {
-            sign configurations.archives
-        }
-
-        uploadArchives {
-            repositories {
-                mavenDeployer {
-                    beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                    repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
-                        authentication(userName: ossrhUsername, password: ossrhPassword)
-                    }
-
-                    pom.project {
-                        name sub.name
-                        packaging 'jar'
-                        // optionally artifactId can be defined here
-                        description 'Yet Another JSON RPC (YAJ-RPC) is a JSON RPC 2.0 implementation for JVM languages written in Kotlin'
-                        url 'https://markaren.github.io/YAJ-RPC/'
-
-                        scm {
-                            connection 'scm:git:git://github.com/markaren/YAJ-RPC.git'
-                            developerConnection 'scm:git:ssh://github.com/markaren/YAJ-RPC.git'
-                            url 'https://github.com/markaren/YAJ-RPC/tree/master'
-                        }
-
-                        licenses {
-                            license {
-                                name 'The MIT License'
-                                url 'https://opensource.org/licenses/mit-license.php'
-                            }
-                        }
-
-                        developers {
-                            developer {
-                                id 'laht'
-                                name 'Lars Ivar Hatledal'
-                                email 'larsivarhatledal@gmail.com'
-                            }
-                        }
-
-                    }
-                }
-            }
-        }
-    }
 }
-
