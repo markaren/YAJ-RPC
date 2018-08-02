@@ -1,8 +1,10 @@
 
-apply plugin: 'kotlin'
-
-apply from: rootProject.file('publisher.gradle')
+apply from: rootProject.file("publisher.gradle")
 
 dependencies {
-    compile project(':yaj-rpc')
+    api project(':yaj-rpc')
+}
+
+pomDescription {
+    description = "HTTP client implementation for YAJ-RPC"
 }

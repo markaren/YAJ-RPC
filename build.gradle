@@ -1,13 +1,15 @@
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.2.51" apply false //apply in sub-projects
+    id "org.jetbrains.kotlin.jvm" version "1.2.60" apply false //apply in sub-projects
 }
 
 println "Gradle version is ${GradleVersion.current().version}"
 
+
 subprojects { sub ->
 
-    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'kotlin'
 
     repositories {
         mavenCentral()
@@ -18,9 +20,7 @@ subprojects { sub ->
 
     dependencies {
 
-        sub.plugins.withId('kotlin') {
-            compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-        }
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
         implementation group: 'org.slf4j', name: 'slf4j-api', version: "$slf4j_version"
         runtimeOnly group: 'org.slf4j', name: 'slf4j-log4j12', version: "$slf4j_version"
@@ -35,22 +35,23 @@ subprojects { sub ->
         useJUnitPlatform()
     }
 
-    sub.plugins.withId('kotlin') {
-        compileKotlin {
-            kotlinOptions {
-                jvmTarget = "1.8"
-                freeCompilerArgs = ['-Xjvm-default=enable']
-            }
-        }
 
-        compileTestKotlin {
-            kotlinOptions {
-                jvmTarget = "1.8"
-                javaParameters = true
-            }
+    compileKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            freeCompilerArgs = ['-Xjvm-default=enable']
         }
     }
+
+    compileTestKotlin {
+        kotlinOptions {
+            jvmTarget = "1.8"
+            javaParameters = true
+        }
+    }
+
 
     compileTestJava.options.compilerArgs.add '-parameters'
 
 }
+

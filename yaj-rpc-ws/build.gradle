@@ -1,9 +1,11 @@
 
-apply plugin: 'kotlin'
-
-apply from: rootProject.file('publisher.gradle')
+apply from: rootProject.file("publisher.gradle")
 
 dependencies {
+    api project(':yaj-rpc')
     implementation group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.3.8'
-    compile project(':yaj-rpc')
+}
+
+pomDescription {
+    description = "WebSockets client implementation for YAJ-RPC"
 }

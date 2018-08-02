@@ -57,7 +57,7 @@ open class RpcZmqServer(
             thread = Thread {
 
                 try {
-                    while (!stop) {
+                    while (!stop && !Thread.currentThread().isInterrupted) {
 
                         val recv = socket.recv()
                         recv ?: break
@@ -96,6 +96,7 @@ open class RpcZmqServer(
             LOG.debug("Stopping ${javaClass.simpleName} ...")
             stop = true
             ctx?.destroy()
+            thread?.interrupt()
             thread?.join()
             thread = null
             LOG.info("${javaClass.simpleName} stopped!")
