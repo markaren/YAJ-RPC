@@ -1,7 +1,11 @@
 
-apply plugin: 'kotlin'
+apply from: rootProject.file("publisher.gradle")
 
 dependencies {
+    api project(':yaj-rpc')
     implementation group: 'org.zeromq', name: 'jeromq', version: '0.4.3'
-    compile project(':yaj-rpc')
+}
+
+pomDescription {
+    description = "ZMQ client implementation for YAJ-RPC"
 }
