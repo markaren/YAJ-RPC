@@ -47,7 +47,7 @@ class PublishPlugin implements Plugin<Project>{
                         pom {
                             name = project.archivesBaseName
                             description = extension.description
-                            url = 'https://markaren.github.io/YAJ-RPC/'
+                            url = 'https://github.com/markaren/YAJ-RPC'
 
                             scm {
                                 connection = 'scm:git:git://github.com/markaren/YAJ-RPC.git'
