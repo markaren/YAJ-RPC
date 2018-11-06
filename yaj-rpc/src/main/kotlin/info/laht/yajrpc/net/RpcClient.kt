@@ -31,9 +31,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.Closeable
 import java.util.*
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.TimeoutException
+import java.util.concurrent.*
 
 var DEFAULT_TIME_OUT: Long = 2000
 typealias Consumer<T> = (T) -> Unit
@@ -52,31 +50,25 @@ interface RpcClient : Closeable {
 
     @JvmDefault
     @Throws(TimeoutException::class)
-    fun write(methodName: String): RpcResponse {
+    fun write(methodName: String): Future<RpcResponse> {
         return write(methodName, RpcParams.noParams(), DEFAULT_TIME_OUT)
     }
 
     @JvmDefault
     @Throws(TimeoutException::class)
-    fun write(methodName: String, timeOut: Long = DEFAULT_TIME_OUT): RpcResponse {
+    fun write(methodName: String, timeOut: Long = DEFAULT_TIME_OUT): Future<RpcResponse> {
         return write(methodName, RpcParams.noParams(), timeOut)
     }
 
     @JvmDefault
     @Throws(TimeoutException::class)
-    fun write(methodName: String, params: RpcParams): RpcResponse {
+    fun write(methodName: String, params: RpcParams): Future<RpcResponse> {
         return write(methodName, params, DEFAULT_TIME_OUT)
     }
 
     @Throws(TimeoutException::class)
-    fun write(methodName: String, params: RpcParams, timeOut: Long = DEFAULT_TIME_OUT): RpcResponse
+    fun write(methodName: String, params: RpcParams, timeOut: Long = DEFAULT_TIME_OUT): Future<RpcResponse>
 
-    @JvmDefault
-    fun writeAsync(methodName: String, callback: Consumer<RpcResponse>) {
-        writeAsync(methodName, RpcParams.noParams(), callback)
-    }
-
-    fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>)
 
 }
 
@@ -87,36 +79,33 @@ abstract class AbstractRpcClient : RpcClient {
 
     private val callbacks = mutableMapOf<String, Consumer<RpcResponse>>()
 
+    private val executor = Executors.newSingleThreadExecutor();
+
     override fun notify(methodName: String, params: RpcParams) {
         internalWrite(RpcRequestOut(methodName, params).toJson())
     }
 
-    override fun writeAsync(methodName: String, params: RpcParams, callback: Consumer<RpcResponse>) {
-        val request = RpcRequestOut(methodName, params).apply {
-            id = UUID.randomUUID().toString()
-            callbacks[id.toString()] = callback
-        }.toJson()
-        internalWrite(request)
-    }
-
-
     @Throws(TimeoutException::class)
-    override fun write(methodName: String, params: RpcParams, timeOut: Long): RpcResponse {
+    override fun write(methodName: String, params: RpcParams, timeOut: Long): Future<RpcResponse> {
 
-        var response: RpcResponse? = null
-        val latch = CountDownLatch(1)
-        val request = RpcRequestOut(methodName, params).apply {
-            id = UUID.randomUUID().toString()
-            callbacks[id.toString()] = {
-                response = it
-                latch.countDown()
+        fun task() = {
+            var response: RpcResponse? = null
+            val latch = CountDownLatch(1)
+            val request = RpcRequestOut(methodName, params).apply {
+                id = UUID.randomUUID().toString()
+                callbacks[id.toString()] = {
+                    response = it
+                    latch.countDown()
+                }
+            }.toJson()
+            internalWrite(request)
+            if (!latch.await(timeOut, TimeUnit.MILLISECONDS)) {
+                throw TimeoutException("Timeout!")
             }
-        }.toJson()
-        internalWrite(request)
-        if (!latch.await(timeOut, TimeUnit.MILLISECONDS)) {
-            throw TimeoutException("Timeout")
+            response!!
         }
-        return response!!
+
+        return executor.submit(task())
 
     }
 
@@ -133,6 +122,10 @@ abstract class AbstractRpcClient : RpcClient {
             }
             callbacks.remove(id)
         }
+    }
+
+    override fun close() {
+        executor.shutdown()
     }
 
     private companion object {

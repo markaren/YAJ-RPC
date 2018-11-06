@@ -65,12 +65,5 @@ class RpcHttpClient(
         messageReceived(connect(msg))
     }
 
-    /**
-     * This method has no effect for
-     * instances of RpcHttpClient
-     */
-    override fun close() {
-        //nothing to do
-    }
 }
 

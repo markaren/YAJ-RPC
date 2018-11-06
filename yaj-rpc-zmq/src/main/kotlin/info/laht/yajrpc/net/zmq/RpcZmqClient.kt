@@ -47,6 +47,7 @@ class RpcZmqClient(
     }
 
     override fun close() {
+        super.close()
         socket.close()
         ctx.close()
     }

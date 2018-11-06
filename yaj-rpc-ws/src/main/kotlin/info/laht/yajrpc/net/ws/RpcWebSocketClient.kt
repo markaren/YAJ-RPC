@@ -44,6 +44,7 @@ open class RpcWebSocketClient(
     private val ws = WebSocketClientImpl().apply { connectBlocking() }
 
     override fun close() {
+        super.close()
         ws.closeBlocking()
     }
 

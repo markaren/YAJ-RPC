@@ -44,14 +44,7 @@ abstract class AbstractTestServer {
         Thread.sleep(100)
         Assertions.assertTrue(service.returnNothingCalled)
 
-        val latch = CountDownLatch(1)
-        client.writeAsync("SampleService.greet", RpcParams.listParams("Clint Eastwood")) {
-            LOG.info("Async response=${it.getResult(String::class.java)}")
-            latch.countDown()
-        }
-        latch.await(1000, TimeUnit.MILLISECONDS)
-
-        client.write("SampleService.greet", RpcListParams("Clint Eastwood")).also {
+        client.write("SampleService.greet", RpcListParams("Clint Eastwood")).get().also {
             LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
 

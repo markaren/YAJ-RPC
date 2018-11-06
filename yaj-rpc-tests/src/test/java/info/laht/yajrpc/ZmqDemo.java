@@ -6,11 +6,12 @@ import info.laht.yajrpc.net.zmq.RpcZmqClient;
 import info.laht.yajrpc.net.zmq.RpcZmqServer;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 class ZmqDemo {
 
-    public static void main(String[] args) throws IOException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws IOException, TimeoutException, InterruptedException, ExecutionException {
 
         RpcHandler handler = new RpcHandler(new SampleService());
         RpcServer server = new RpcZmqServer(handler);

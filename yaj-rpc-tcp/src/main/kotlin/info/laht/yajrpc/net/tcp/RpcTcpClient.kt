@@ -69,7 +69,10 @@ open class RpcTcpClient(
         }.start()
     }
 
-    override fun close() = socket.close()
+    override fun close() {
+        super.close()
+        socket.close()
+    }
 
     override fun internalWrite(msg: String) {
 
