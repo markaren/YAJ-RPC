@@ -55,6 +55,22 @@ abstract class AbstractTestServer {
             LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
 
+        testWrapper()
+    }
+
+    fun testWrapper(){
+        val wrapper = SampleServiceWrapper(client)
+
+        wrapper.returnNothing()
+        Assertions.assertEquals(wrapper.greet("Clint Eastwood"), service.greet("Clint Eastwood"))
+
+        val clazz = SampleService.MyClass().apply {
+            i = 1
+            d = 2.0
+            s = "foo"
+        }
+        Assertions.assertEquals(wrapper.complex(clazz).d, 4.0)
+
     }
 
 }

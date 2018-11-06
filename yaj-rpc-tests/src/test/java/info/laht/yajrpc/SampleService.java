@@ -1,9 +1,11 @@
 package info.laht.yajrpc;
 
+import info.laht.yajrpc.annotationprocessor.GenerateRpcWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@GenerateRpcWrapper
 public class SampleService implements RpcService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleService.class);
@@ -40,7 +42,7 @@ public class SampleService implements RpcService {
         return myClass;
     }
 
-    static class MyClass {
+    public static class MyClass {
         int i;
         double d;
         String s;

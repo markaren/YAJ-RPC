@@ -1,3 +1,6 @@
+plugins {
+    id "org.jetbrains.kotlin.kapt"
+}
 
 dependencies {
     testImplementation project(':yaj-rpc')
@@ -5,4 +8,6 @@ dependencies {
     testImplementation project(':yaj-rpc-tcp')
     testImplementation project(':yaj-rpc-zmq')
     testImplementation project(':yaj-rpc-http')
+    testImplementation project(':yaj-rpc-annotation-processor')
+    kaptTest project(':yaj-rpc-annotation-processor')
 }

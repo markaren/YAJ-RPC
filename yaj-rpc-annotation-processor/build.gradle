@@ -1,0 +1,16 @@
+plugins {
+    id "org.jetbrains.kotlin.kapt"
+}
+
+apply from: rootProject.file("publisher.gradle")
+
+dependencies {
+    api project(':yaj-rpc')
+    implementation "com.google.auto.service:auto-service:1.0-rc4"
+    implementation 'com.squareup:kotlinpoet:1.0.0-RC2'
+    kapt "com.google.auto.service:auto-service:1.0-rc4"
+}
+
+pomDescription {
+    description = "Annotation processors for YAJ RPC"
+}
