@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class AbstractTestServer {
@@ -47,6 +45,22 @@ abstract class AbstractTestServer {
         client.write("SampleService.greet", RpcListParams("Clint Eastwood")).get().also {
             LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
+
+        testWrapper()
+    }
+
+    fun testWrapper(){
+        val wrapper = SampleServiceWrapper(client)
+
+        wrapper.returnNothing()
+        Assertions.assertEquals(wrapper.greet("Clint Eastwood"), service.greet("Clint Eastwood"))
+
+        val clazz = SampleService.MyClass().apply {
+            i = 1
+            d = 2.0
+            s = "foo"
+        }
+        Assertions.assertEquals(wrapper.complex(clazz).d, 4.0)
 
     }
 
