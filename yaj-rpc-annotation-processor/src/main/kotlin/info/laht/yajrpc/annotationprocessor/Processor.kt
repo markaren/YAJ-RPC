@@ -79,9 +79,8 @@ class GenerateWrappersProcessor : AbstractProcessor() {
                 builder.addType(type.build())
             }
 
-            val outputFile = File("$kaptKotlinGeneratedDir/info/laht/yajrpc/Wrappers.kt")
-            outputFile.parentFile.mkdirs()
-            builder.build().writeTo(outputFile)
+            val outputDirectory = File(kaptKotlinGeneratedDir)
+            builder.build().writeTo(outputDirectory)
         }
         return true
     }
