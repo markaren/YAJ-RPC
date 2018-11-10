@@ -6,4 +6,4 @@ include 'yaj-rpc-zmq'
 include 'yaj-rpc-tcp'
 include 'yaj-rpc-http'
 include 'yaj-rpc-tests'
-
+include 'yaj-rpc-annotation-processor'
