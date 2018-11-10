@@ -35,6 +35,8 @@ class RpcResponse internal constructor() {
 
     companion object {
 
+        private val gson = Gson()
+
         fun fromJson(json: String): RpcResponse {
             return YAJRPC.fromJson(json, RpcResponse::class.java)
         }
@@ -63,7 +65,7 @@ class RpcResponse internal constructor() {
 
     fun <T> getResult(clazz: Class<T>): T? {
         return if (hasResult) {
-            Gson().fromJson(result, clazz)
+           gson.fromJson(result, clazz)
         } else null
     }
 
