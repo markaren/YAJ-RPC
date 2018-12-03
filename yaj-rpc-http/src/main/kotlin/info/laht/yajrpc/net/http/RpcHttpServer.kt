@@ -31,7 +31,6 @@ import info.laht.yajrpc.RpcHandler
 import info.laht.yajrpc.net.RpcServer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
@@ -116,16 +115,7 @@ open class RpcHttpServer @JvmOverloads constructor(
             val contentType: String = t.requestHeaders.getFirst("Content-Type")
 
             if (contentType in legalContentTypes) {
-                val data = t.requestBody.use {
-                    val out = ByteArrayOutputStream()
-                    val buf = ByteArray(4096)
-                    var n = it.read(buf)
-                    while (n > 0) {
-                        out.write(buf, 0, n)
-                        n = it.read(buf)
-                    }
-                    String(out.toByteArray(), Charset.forName("UTF-8"))
-                }
+                val data = t.requestBody.reader().readText()
 
                 LOG.trace("Received: $data")
                 handler.handle(data)?.also { response ->
