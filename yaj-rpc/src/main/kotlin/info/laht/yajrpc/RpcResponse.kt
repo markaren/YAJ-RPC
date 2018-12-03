@@ -38,7 +38,7 @@ class RpcResponse internal constructor() {
 
     val id: Any = NO_ID
     val error: RpcError? = null
-    private val result: String? = null
+    private val result: Any? = null
 
     val isVoid: Boolean
         get() = hasResult && result == null
@@ -54,8 +54,8 @@ class RpcResponse internal constructor() {
     }
 
     fun <T> getResult(clazz: Class<T>): T? {
-        return if (hasResult) {
-           YAJRPC.fromJson(result!!, clazz)
+        return if (hasResult && !isVoid) {
+           YAJRPC.fromJson(YAJRPC.toJson(result!!), clazz)
         } else null
     }
 
