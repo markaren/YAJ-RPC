@@ -80,13 +80,13 @@ class RpcHandler private constructor(
         val id = req.id
         val split = req.methodName!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
         if (split.size != 2) {
-            val msg = "method does not use '.' to separate service and method"
+            val msg = "Method does not use '.' to separate service and method"
             LOG.warn(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_REQUEST, msg)
         }
         val serviceName = split[0]
         if (!services.containsKey(serviceName)) {
-            val msg = "no such registered service '$serviceName'"
+            val msg = "No such registered service '$serviceName'"
             LOG.warn(msg)
             return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
         }
@@ -95,12 +95,11 @@ class RpcHandler private constructor(
         val paramCount = req.params.paramCount
         val method = RpcService.getExposedMethod(service, methodName, paramCount)
         if (method == null) {
-            val msg = "no such method '$methodName' in service '$serviceName' that takes $paramCount params"
+            val msg = "No such method '$methodName' in service '$serviceName' that takes $paramCount params"
             LOG.warn(msg)
             return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
         }
-        val params = req.params
-        return when (params) {
+        return when (val params = req.params) {
             RpcNoParams -> handleNoParams(service, method, id, req.isNotification)
             is RpcListParams<*> -> handleListParams(service, method, params.value as List<JsonElement>, id, req.isNotification)
             is RpcMapParams<*> -> handleMapParams(service, method, params.value as Map<String, JsonElement>, id, req.isNotification)
@@ -162,11 +161,11 @@ class RpcHandler private constructor(
         val collect = params.keys.map({ key -> method.indexOf(key) })
         if (collect.contains(-1)) {
             val parameterNames = method.parameters.map { it.name }
-            val msg = "mismatch between one or more parameter names and params keys, params: $params, parameterNames: $parameterNames"
+            val msg = "Mismatch between one or more parameter names and params keys, params: $params, parameterNames: $parameterNames"
             LOG.error(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_PARAMS, msg)
         }
-        return MutableList(params.size, { i -> params.getValueByIndex(collect[i]) }).let {
+        return MutableList(params.size) { i -> params.getValueByIndex(collect[i]) }.let {
             handleListParams(service, method, it, id, isNotification)
         }
     }
