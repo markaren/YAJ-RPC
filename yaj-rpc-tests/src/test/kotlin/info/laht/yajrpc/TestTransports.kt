@@ -89,7 +89,10 @@ abstract class AbstractTestServer {
             d = 2.0
             s = "foo"
         }
-        Assertions.assertEquals(wrapper.complex(clazz).d, 4.0)
+        val result = wrapper.complex(clazz)
+        Assertions.assertEquals(result.i,  1)
+        Assertions.assertEquals(result.d, 4.0)
+        Assertions.assertEquals(result.s, "foo")
 
     }
 

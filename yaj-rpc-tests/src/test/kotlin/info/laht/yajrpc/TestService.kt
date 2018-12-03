@@ -70,16 +70,22 @@ class TestService {
     @Test
     fun testServices() {
 
-        RpcHandler(SampleService("Service1"), SampleService("Service2")).apply {
+        val handler = RpcHandler(SampleService("Service1"), SampleService("Service2"))
 
-            val json = formatMsg(1, "doubleInput", "[10]")
 
-            handle(json).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            val msg1 = formatMsg(1, "Service1.doubleInteger", "[10]")
+            handler.handle(msg1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                Assertions.assertEquals(20, it.getResult<Int>())
+            }
+
+            val json = formatMsg(1, "doubleInteger", "[10]")
+            handler.handle(json).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
                 Assertions.assertTrue(it.hasError)
             }
 
-        }
+
 
     }
 
