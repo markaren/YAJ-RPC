@@ -60,11 +60,11 @@ interface RpcService {
 
             fun toMap(m: Method): Map<String, Any> {
                 return mutableMapOf<String, Any>().also { map1 ->
-                    val list = List(m.parameterCount, { i ->
+                    val list = List(m.parameterCount) { i ->
                         m.parameters[i].let {
                             "${it.name}:${it.type.simpleName}"
                         }
-                    })
+                    }
                     map1[PARAMS_KEY] = if (list.isEmpty()) "void" else list
                     map1[RESULT_KEY] = if (m.returnType == null) "void" else m.returnType.simpleName
                 }
