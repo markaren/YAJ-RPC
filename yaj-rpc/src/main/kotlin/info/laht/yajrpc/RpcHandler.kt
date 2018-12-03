@@ -78,24 +78,32 @@ class RpcHandler private constructor(
     @Suppress("UNCHECKED_CAST")
     private fun handle(req: RpcRequest): String? {
         val id = req.id
-        val split = req.methodName!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if (split.size != 2) {
-            val msg = "Method does not use '.' to separate service and method"
+        val service: RpcService
+        val methodName: String
+
+        val split = req.methodName!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
+        if (split.size == 2) {
+            val serviceName = split[0]
+            if (!services.containsKey(serviceName)) {
+                val msg = "No such registered service '$serviceName'"
+                LOG.warn(msg)
+                return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
+            }
+            service = services[serviceName]!!
+            methodName = split[1]
+        } else if (services.size == 1) {
+            service = services.values.toList()[0]
+            methodName = req.methodName!!
+        } else {
+            val msg = "Multiple services defined and method does not use '.' to separate service and method!"
             LOG.warn(msg)
             return createErrorResponse(id, RpcError.ErrorType.INVALID_REQUEST, msg)
         }
-        val serviceName = split[0]
-        if (!services.containsKey(serviceName)) {
-            val msg = "No such registered service '$serviceName'"
-            LOG.warn(msg)
-            return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
-        }
-        val service = services[serviceName]!!
-        val methodName = split[1]
+
         val paramCount = req.params.paramCount
         val method = RpcService.getExposedMethod(service, methodName, paramCount)
         if (method == null) {
-            val msg = "No such method '$methodName' in service '$serviceName' that takes $paramCount params"
+            val msg = "No such method '$methodName' in service '${service.serviceName}' that takes $paramCount params"
             LOG.warn(msg)
             return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
         }
