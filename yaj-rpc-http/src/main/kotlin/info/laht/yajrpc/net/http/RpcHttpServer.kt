@@ -93,18 +93,15 @@ abstract class SimpleHTTPServer {
 
 }
 
-open class RpcHttpServer(
-        val handler: RpcHandler
+open class RpcHttpServer @JvmOverloads constructor(
+        val handler: RpcHandler,
+        override val context: String = "/jsonrpc"
 ) : SimpleHTTPServer(), RpcServer {
 
     val legalContentTypes =
             arrayOf("application/json-rpc",
                     "application/json",
                     "application/jsonrequest")
-
-
-    override val context: String
-        get() = "/jsonrpc"
 
     override val httpHandler: HttpHandler by lazy { MyHttpHandler() }
 
