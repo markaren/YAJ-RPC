@@ -33,16 +33,6 @@ import com.google.gson.annotations.SerializedName
  */
 class RpcResponse internal constructor() {
 
-    companion object {
-
-        private val gson = Gson()
-
-        fun fromJson(json: String): RpcResponse {
-            return YAJRPC.fromJson(json, RpcResponse::class.java)
-        }
-
-    }
-
     @SerializedName(JSON_RPC_IDENTIFIER)
     val version: String? = null
 
@@ -65,7 +55,7 @@ class RpcResponse internal constructor() {
 
     fun <T> getResult(clazz: Class<T>): T? {
         return if (hasResult) {
-           gson.fromJson(result, clazz)
+           YAJRPC.fromJson(result!!, clazz)
         } else null
     }
 

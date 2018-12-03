@@ -27,6 +27,7 @@ package info.laht.yajrpc.net
 import info.laht.yajrpc.RpcParams
 import info.laht.yajrpc.RpcRequestOut
 import info.laht.yajrpc.RpcResponse
+import info.laht.yajrpc.YAJRPC
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.Closeable
@@ -112,7 +113,7 @@ abstract class AbstractRpcClient : RpcClient {
     protected abstract fun internalWrite(msg: String)
 
     protected fun messageReceived(message: String) {
-        val response = RpcResponse.fromJson(message)
+        val response = YAJRPC.fromJson<RpcResponse>(message)
         if (response.error != null) {
             LOG.warn("RPC invocation returned error: ${response.error}")
         } else {
