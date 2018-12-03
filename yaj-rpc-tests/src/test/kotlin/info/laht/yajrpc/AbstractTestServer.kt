@@ -46,10 +46,14 @@ abstract class AbstractTestServer {
             LOG.info("Synchronous response=${it.getResult(String::class.java)}")
         }
 
+        client.write("greet", RpcListParams("Clint Eastwood")).get().also {
+            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
+        }
+
         testWrapper()
     }
 
-    fun testWrapper(){
+    private fun testWrapper(){
         val wrapper = SampleServiceWrapper(client)
 
         wrapper.returnNothing()
