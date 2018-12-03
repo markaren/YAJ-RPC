@@ -5,6 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @GenerateRpcWrapper
 public class SampleService implements RpcService {
 
@@ -49,6 +52,15 @@ public class SampleService implements RpcService {
         LOG.debug("method complex called");
         myClass.d *= 2;
         return myClass;
+    }
+
+    @RpcMethod
+    public List<String> getSomeStrings() {
+        List<String> list = new ArrayList<>();
+        list.add("String1");
+        list.add("String2");
+        list.add("String3");
+        return list;
     }
 
     public static class MyClass {
