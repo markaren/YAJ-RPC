@@ -10,11 +10,20 @@ public class SampleService implements RpcService {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleService.class);
 
+    private String name;
     public boolean returnNothingCalled = false;
+
+    public SampleService() {
+        this(SampleService.class.getSimpleName());
+    }
+
+    public SampleService(String name) {
+        this.name = name;
+    }
 
     @NotNull
     public String getServiceName() {
-        return SampleService.class.getSimpleName();
+        return name;
     }
 
     @RpcMethod

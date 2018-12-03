@@ -11,12 +11,27 @@ class TestService {
         private val LOG: Logger = LoggerFactory.getLogger(TestService::class.java)
     }
 
+    private fun formatMsg(id: Int, methodName: String, params: String): String {
+        return """
+            {
+                "$JSON_RPC_IDENTIFIER": "2.0",
+                "$ID_KEY": $id,
+                "$METHOD_KEY": $methodName,
+                "$PARAMS_KEY": $params
+            }
+            """
+    }
+
     @Test
     fun testService() {
 
         RpcHandler(SampleService()).apply {
 
             LOG.info(getOpenMessage())
+
+            val json1 = formatMsg(1, "SampleService.doubleInput", "[10]")
+            val json2 = formatMsg(1, "SampleService.complex", "[{\"i\": 1, \"d\": 2.0, \"s\": \"per\"}]")
+            val json3 = formatMsg(5, "SampleService.returnNothing", "null")
 
             handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
@@ -40,31 +55,21 @@ class TestService {
 
     }
 
-    private val json1 = """
-            {
-                "$JSON_RPC_IDENTIFIER": "2.0",
-                "$ID_KEY": 1,
-                "$METHOD_KEY": "SampleService.doubleInput",
-                "$PARAMS_KEY": [10]
-            }
-            """
+    @Test
+    fun testServices() {
 
-    private val json2 = """
-            {
-                "$JSON_RPC_IDENTIFIER": "2.0",
-                "$ID_KEY": 1,
-                "$METHOD_KEY": "SampleService.complex",
-                "$PARAMS_KEY": [{"i": 1, "d": 2.0, "s": "per"}]
-            }
-            """
+        RpcHandler(SampleService("Service1"), SampleService("Service2")).apply {
 
-    private val json3 = """
-            {
-                "$JSON_RPC_IDENTIFIER": "2.0",
-                "$ID_KEY": 5,
-                "$METHOD_KEY": "SampleService.returnNothing",
-                "$PARAMS_KEY": null
+            val json = formatMsg(1, "doubleInput", "[10]")
+
+            handle(json).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                Assertions.assertTrue(it.hasError)
             }
-            """
+
+        }
+
+    }
+
 
 }
