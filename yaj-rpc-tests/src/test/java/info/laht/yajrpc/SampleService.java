@@ -30,8 +30,14 @@ public class SampleService implements RpcService {
     }
 
     @RpcMethod
-    public int doubleInput(int i) {
-        LOG.debug("method doubleInput called");
+    public int doubleInteger(int i) {
+        LOG.debug("method doubleInteger with an integer called");
+        return i * 2;
+    }
+
+    @RpcMethod
+    public double doubleDouble(double i) {
+        LOG.debug("method doubleDouble with a floating-point number called called");
         return i * 2;
     }
 

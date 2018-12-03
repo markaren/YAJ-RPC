@@ -29,17 +29,23 @@ class TestService {
 
             LOG.info(getOpenMessage())
 
-            val json1 = formatMsg(1, "SampleService.doubleInput", "[10]")
-            val json2 = formatMsg(1, "SampleService.complex", "[{\"i\": 1, \"d\": 2.0, \"s\": \"per\"}]")
-            val json3 = formatMsg(5, "SampleService.returnNothing", "null")
-            val json4 = formatMsg(5, "SampleService.getSomeStrings", "null")
+            val json1 = formatMsg(1, "SampleService.doubleInteger", "[10]")
+            val json2 = formatMsg(2, "SampleService.doubleDouble", "[10.25]")
+            val json3 = formatMsg(3, "SampleService.complex", "[{\"i\": 1, \"d\": 2.0, \"s\": \"per\"}]")
+            val json4 = formatMsg(4, "SampleService.returnNothing", "null")
+            val json5 = formatMsg(5, "SampleService.getSomeStrings", "null")
 
             handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
-                Assertions.assertEquals(20.0, it.getResult<Double>()!!)
+                Assertions.assertEquals(20, it.getResult<Int>()!!)
             }
 
             handle(json2).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                Assertions.assertEquals(20.50, it.getResult<Double>()!!)
+            }
+
+            handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
                 val result = it.getResult<SampleService.MyClass>()!!
                 Assertions.assertEquals(1, result.i)
@@ -47,12 +53,12 @@ class TestService {
                 Assertions.assertEquals("per", result.s)
             }
 
-            handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            handle(json4).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
                 Assertions.assertNull(it.getResult())
             }
 
-            handle(json4).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            handle(json5).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
                 Assertions.assertEquals(listOf("String1", "String2", "String3"), it.getResult<List<String>>())
             }
