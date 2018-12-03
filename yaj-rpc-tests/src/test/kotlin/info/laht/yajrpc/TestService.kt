@@ -32,6 +32,7 @@ class TestService {
             val json1 = formatMsg(1, "SampleService.doubleInput", "[10]")
             val json2 = formatMsg(1, "SampleService.complex", "[{\"i\": 1, \"d\": 2.0, \"s\": \"per\"}]")
             val json3 = formatMsg(5, "SampleService.returnNothing", "null")
+            val json4 = formatMsg(5, "SampleService.getSomeStrings", "null")
 
             handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
@@ -49,6 +50,11 @@ class TestService {
             handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
                 LOG.info("$it")
                 Assertions.assertNull(it.getResult())
+            }
+
+            handle(json4).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+                LOG.info("$it")
+                Assertions.assertEquals(listOf("String1", "String2", "String3"), it.getResult<List<String>>())
             }
 
         }
