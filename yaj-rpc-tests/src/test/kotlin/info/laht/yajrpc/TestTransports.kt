@@ -24,8 +24,8 @@ abstract class AbstractTestServer {
         private val LOG: Logger = LoggerFactory.getLogger(AbstractTestServer::class.java)
     }
 
-    val server: RpcServer
-    val client: RpcClient
+    private val server: RpcServer
+    private val client: RpcClient
     private val service = SampleService()
     private val handler = RpcHandler(service)
 
