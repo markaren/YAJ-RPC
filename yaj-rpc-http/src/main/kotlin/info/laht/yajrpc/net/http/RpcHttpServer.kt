@@ -42,6 +42,7 @@ import java.util.*
 abstract class SimpleHTTPServer {
 
     var port: Int? = null
+    private set
 
     private var server: HttpServer? = null
     protected abstract val context: String
@@ -133,8 +134,8 @@ open class RpcHttpServer @JvmOverloads constructor(
         }
     }
 
-    companion object {
-        val LOG: Logger = LoggerFactory.getLogger(RpcHttpServer::class.java)
+    private companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(RpcHttpServer::class.java)
     }
 
 }
