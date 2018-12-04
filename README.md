@@ -5,7 +5,7 @@
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.laht/yaj-rpc/badge.svg)](https://mvnrepository.com/artifact/info.laht/yaj-rpc)
 
-
+[![CircleCI](https://circleci.com/gh/markaren/YAJ-RPC/tree/master.svg?style=svg)](https://circleci.com/gh/markaren/YAJ-RPC/tree/master)
 
 Yet Another JSON-RPC (YAJ-RPC) is a JSON RPC 2.0 implementation for JVM languages written in Kotlin.
 
