@@ -217,11 +217,7 @@ class RpcHandler private constructor(
         }
 
         fun createResponse(result: Any?, id: Any): String {
-            return mutableMapOf<String, Any?>().also {
-                it[JSON_RPC_IDENTIFIER] = JSON_RPC_VERSION
-                it[RESULT_KEY] = result
-                it[ID_KEY] = id
-            }.let { YAJRPC.toJson(it) }
+            return RpcResponseOut(id, result).let { YAJRPC.toJson(it) }
         }
 
     }
