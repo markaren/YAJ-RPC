@@ -34,12 +34,13 @@ import java.nio.charset.Charset
 /**
  * @author Lars Ivar Hatledal
  */
-class RpcHttpClient(
+class RpcHttpClient @JvmOverloads constructor(
         host: String,
-        port: Int
+        port: Int,
+        context: String = "jsonrpc"
 ) : AbstractRpcClient() {
 
-    private val url = "http://$host:$port/jsonrpc"
+    private val url = "http://$host:$port/$context"
 
     private fun connect(msg: String): String {
         val con = (URL(url).openConnection() as HttpURLConnection).apply {
