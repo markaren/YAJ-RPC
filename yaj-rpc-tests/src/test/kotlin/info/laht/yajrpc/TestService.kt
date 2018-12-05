@@ -28,7 +28,7 @@ class TestService {
 
     @Test
     fun testDoubleDouble() {
-        val request = formatMsg(1, "SampleService.doubleDouble", "[10.25]")
+        val request = formatMsg(2.0, "SampleService.doubleDouble", "[10.25]")
         val response = handler.handle(request)!!
 
         LOG.debug("JSON request=$request")
@@ -58,7 +58,7 @@ class TestService {
 
     @Test
     fun testReturnNothing() {
-        val request = formatMsg(4, "SampleService.returnNothing", "null")
+        val request = formatMsg("4.0", "SampleService.returnNothing", "null")
         val response = handler.handle(request)!!
 
         LOG.debug("JSON request=$request")
@@ -101,7 +101,7 @@ class TestService {
 
     }
 
-    private fun formatMsg(id: Int, methodName: String, params: String): String {
+    private fun formatMsg(id: Any, methodName: String, params: String): String {
         return """
             {
                 "$JSON_RPC_IDENTIFIER": "2.0",
