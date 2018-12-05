@@ -41,7 +41,16 @@ interface RpcRequest {
 
     companion object {
         internal fun fromJson(json: String): RpcRequest {
-            return YAJRPC.fromJson<RpcRequestIn>(json)
+
+            val id = json.substringAfter("\"id\":").split(",".toRegex())[0].trim()
+
+            val intId = id.toIntOrNull()
+            return if (intId == null) {
+                YAJRPC.fromJson<RpcRequestIn>(json)
+            } else {
+                YAJRPC.fromJson<RpcRequestInWithIntId>(json)
+            }
+
         }
     }
 
@@ -90,6 +99,39 @@ class RpcRequestIn internal constructor() : RpcRequest {
             methodName?.also { add("$METHOD_KEY=$it") }
             add("$PARAMS_KEY=$params")
             if (id !== NO_ID) {
+                add("$ID_KEY=$id")
+            }
+            add("isNotification=$isNotification")
+
+        }.joinToString(", ").let { "RpcRequestIn($it)" }
+
+    }
+
+}
+
+class RpcRequestInWithIntId internal constructor() : RpcRequest {
+
+    override val id: Int = -1
+
+    @SerializedName(value = METHOD_KEY)
+    override val methodName: String? = null
+
+    @SerializedName(JSON_RPC_IDENTIFIER)
+    override val version: String? = null
+
+    @SerializedName(PARAMS_KEY)
+    private val _params: RpcParams? = null
+
+    override val params: RpcParams
+        get() = _params ?: RpcNoParams
+
+    override fun toString(): String {
+        return mutableListOf<String>().apply {
+
+            version?.also { add("$JSON_RPC_IDENTIFIER=$it") }
+            methodName?.also { add("$METHOD_KEY=$it") }
+            add("$PARAMS_KEY=$params")
+            if (id != -1) {
                 add("$ID_KEY=$id")
             }
             add("isNotification=$isNotification")
