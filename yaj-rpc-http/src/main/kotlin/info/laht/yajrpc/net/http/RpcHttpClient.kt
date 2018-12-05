@@ -53,9 +53,9 @@ class RpcHttpClient(
             connect()
         }
         return StringBuilder().apply {
-            BufferedReader(InputStreamReader(con.inputStream)).use {
+            con.inputStream.bufferedReader().use {
                 while (true) {
-                    it.readLine()?.also { append(it) } ?: break
+                    it.readLine()?.also { line -> append(line) } ?: break
                 }
             }
         }.toString()
