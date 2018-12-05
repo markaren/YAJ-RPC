@@ -24,7 +24,6 @@
 
 package info.laht.yajrpc
 
-import com.google.gson.Gson
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -59,8 +58,15 @@ class RpcResponse internal constructor() {
         } else null
     }
 
-    @Suppress("IMPLICIT_CAST_TO_ANY")
     override fun toString(): String {
-        return "JsonRPCResponse{" + "$JSON_RPC_IDENTIFIER=$version, $ID_KEY=$id, response=${(if (hasError) error else result)}}"
+        return "RPCResponse{" + "$JSON_RPC_IDENTIFIER=$version, $ID_KEY=$id, response=${(if (hasError) error else result)}}"
     }
+}
+
+data class RpcResponseOut(
+        private val id: Any,
+        private val result: Any?
+) {
+
+    private val jsonrpc = JSON_RPC_VERSION
 }
