@@ -42,6 +42,7 @@ import java.util.*
 abstract class SimpleHTTPServer {
 
     var port: Int? = null
+    private set
 
     private var server: HttpServer? = null
     protected abstract val context: String
@@ -72,22 +73,10 @@ abstract class SimpleHTTPServer {
         }
     }
 
-    protected fun queryToMap(query: String): Map<String, String> {
+    companion object {
 
-        val result = HashMap<String, String>()
-        for (param in query.split("&".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()) {
-            val pair = param.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            if (pair.size > 1) {
-                result[pair[0]] = pair[1]
-            } else {
-                result[pair[0]] = ""
-            }
-        }
-        return result
-    }
-
-    private companion object {
         private val LOG: Logger = LoggerFactory.getLogger(SimpleHTTPServer::class.java)
+
     }
 
 }
@@ -133,8 +122,8 @@ open class RpcHttpServer @JvmOverloads constructor(
         }
     }
 
-    companion object {
-        val LOG: Logger = LoggerFactory.getLogger(RpcHttpServer::class.java)
+    private companion object {
+        private val LOG: Logger = LoggerFactory.getLogger(RpcHttpServer::class.java)
     }
 
 }
