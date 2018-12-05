@@ -8,7 +8,97 @@ import org.slf4j.LoggerFactory
 class TestService {
 
     private companion object {
-        private val LOG: Logger = LoggerFactory.getLogger(TestService::class.java)
+        val LOG: Logger = LoggerFactory.getLogger(TestService::class.java)
+        val service = SampleService()
+        val handler = RpcHandler(service)
+    }
+
+    @Test
+    fun testDoubleInteger() {
+        val request = formatMsg(1, "SampleService.doubleInteger", "[10]")
+        val response = handler.handle(request)!!
+
+        LOG.debug("JSON request=$request")
+        LOG.debug("JSON response=$response")
+
+        YAJRPC.fromJson<RpcResponse>(response).also {
+            Assertions.assertEquals(20, it.getResult<Int>()!!)
+        }
+    }
+
+    @Test
+    fun testDoubleDouble() {
+        val request = formatMsg(1, "SampleService.doubleDouble", "[10.25]")
+        val response = handler.handle(request)!!
+
+        LOG.debug("JSON request=$request")
+        LOG.debug("JSON response=$response")
+
+        YAJRPC.fromJson<RpcResponse>(response).also {
+            Assertions.assertEquals(20.50, it.getResult<Double>()!!)
+        }
+    }
+
+    @Test
+    fun testComplex() {
+        val request = formatMsg(3, "SampleService.complex", "[{\"i\": 1, \"d\": 2.0, \"s\": \"per\"}]")
+        val response = handler.handle(request)!!
+
+        LOG.debug("JSON request=$request")
+        LOG.debug("JSON response=$response")
+
+        YAJRPC.fromJson<RpcResponse>(response).also {
+            it.getResult<SampleService.MyClass>()!!.also { result ->
+                Assertions.assertEquals(1, result.i)
+                Assertions.assertEquals(4.0, result.d)
+                Assertions.assertEquals("per", result.s)
+            }
+        }
+    }
+
+    @Test
+    fun testReturnNothing() {
+        val request = formatMsg(4, "SampleService.returnNothing", "null")
+        val response = handler.handle(request)!!
+
+        LOG.debug("JSON request=$request")
+        LOG.debug("JSON response=$response")
+
+        YAJRPC.fromJson<RpcResponse>(response).also {
+            Assertions.assertNull(it.getResult())
+        }
+    }
+
+    @Test
+    fun testGetSomeStrings() {
+        val request = formatMsg(5, "SampleService.getSomeStrings", "null")
+        val response = handler.handle(request)!!
+
+        LOG.debug("JSON request=$request")
+        LOG.debug("JSON response=$response")
+
+        YAJRPC.fromJson<RpcResponse>(response).also {
+            Assertions.assertEquals(service.someStrings, it.getResult<List<String>>())
+        }
+    }
+
+    @Test
+    fun testMultipleServices() {
+
+        val handler = RpcHandler(SampleService("Service1"), SampleService("Service2"))
+
+        val msg1 = formatMsg(1, "Service1.doubleInteger", "[10]")
+        handler.handle(msg1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            LOG.info("$it")
+            Assertions.assertEquals(20, it.getResult<Int>())
+        }
+
+        val json = formatMsg(1, "doubleInteger", "[10]")
+        handler.handle(json).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
+            LOG.info("$it")
+            Assertions.assertTrue(it.hasError)
+        }
+
     }
 
     private fun formatMsg(id: Int, methodName: String, params: String): String {
@@ -21,73 +111,5 @@ class TestService {
             }
             """
     }
-
-    @Test
-    fun testService() {
-
-        RpcHandler(SampleService()).apply {
-
-            LOG.info(getOpenMessage())
-
-            val json1 = formatMsg(1, "SampleService.doubleInteger", "[10]")
-            val json2 = formatMsg(2, "SampleService.doubleDouble", "[10.25]")
-            val json3 = formatMsg(3, "SampleService.complex", "[{\"i\": 1, \"d\": 2.0, \"s\": \"per\"}]")
-            val json4 = formatMsg(4, "SampleService.returnNothing", "null")
-            val json5 = formatMsg(5, "SampleService.getSomeStrings", "null")
-
-            handle(json1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                Assertions.assertEquals(20, it.getResult<Int>()!!)
-            }
-
-            handle(json2).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                Assertions.assertEquals(20.50, it.getResult<Double>()!!)
-            }
-
-            handle(json3).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                val result = it.getResult<SampleService.MyClass>()!!
-                Assertions.assertEquals(1, result.i)
-                Assertions.assertEquals(4.0, result.d)
-                Assertions.assertEquals("per", result.s)
-            }
-
-            handle(json4).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                Assertions.assertNull(it.getResult())
-            }
-
-            handle(json5).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                Assertions.assertEquals(listOf("String1", "String2", "String3"), it.getResult<List<String>>())
-            }
-
-        }
-
-    }
-
-    @Test
-    fun testServices() {
-
-        val handler = RpcHandler(SampleService("Service1"), SampleService("Service2"))
-
-
-            val msg1 = formatMsg(1, "Service1.doubleInteger", "[10]")
-            handler.handle(msg1).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                Assertions.assertEquals(20, it.getResult<Int>())
-            }
-
-            val json = formatMsg(1, "doubleInteger", "[10]")
-            handler.handle(json).let { YAJRPC.fromJson<RpcResponse>(it!!) }.also {
-                LOG.info("$it")
-                Assertions.assertTrue(it.hasError)
-            }
-
-
-
-    }
-
 
 }
