@@ -32,6 +32,7 @@ import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.Socket
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 open class RpcTcpClient(
         host: String,
@@ -39,8 +40,8 @@ open class RpcTcpClient(
 ) : AbstractRpcClient() {
 
     private val socket: Socket = Socket(host, port)
-    private val `in` = BufferedInputStream(socket.getInputStream())
-    private val out = BufferedOutputStream(socket.getOutputStream())
+    private val `in` = socket.getInputStream().buffered()
+    private val out = socket.getOutputStream().buffered()
 
     init {
         start()
@@ -57,7 +58,7 @@ open class RpcTcpClient(
                     val len = ByteBuffer.wrap(lenBuf).int
                     val msg = ByteArray(len).also {
                         `in`.read(it, 0, len)
-                    }.let { String(it) }
+                    }.toString(Charset.defaultCharset())
 
                     messageReceived(msg)
 
@@ -77,9 +78,8 @@ open class RpcTcpClient(
     override fun internalWrite(msg: String) {
 
         val bytes = msg.toByteArray()
-        val len = bytes.size.let {
-            ByteBuffer.allocate(4).putInt(it).array()
-        }
+        val len = ByteBuffer.allocate(4).putInt(bytes.size).array()
+
         out.write(len)
         out.write(bytes)
         out.flush()

@@ -34,6 +34,7 @@ import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
 import java.nio.ByteBuffer
+import java.nio.charset.Charset
 
 /**
  * @author Lars Ivar Hatledal
@@ -87,8 +88,8 @@ open class RpcTcpServer(
             socket: Socket
     ) : Runnable {
 
-        val `in` = BufferedInputStream(socket.getInputStream())
-        val out = BufferedOutputStream(socket.getOutputStream())
+        private val `in` = socket.getInputStream().buffered()
+        private val out = socket.getOutputStream().buffered()
 
         override fun run() {
 
@@ -100,7 +101,7 @@ open class RpcTcpServer(
                     val len = ByteBuffer.wrap(lenBuf).int
                     val msg = ByteArray(len).also {
                         `in`.read(it, 0, len)
-                    }.let { String(it).replace(0.toChar(), ' ').trim() }
+                    }.toString(Charset.defaultCharset()).replace(0.toChar(), ' ').trim()
 
                     if (msg.isNotEmpty()) {
                         LOG.trace("Received: $msg")
@@ -117,7 +118,7 @@ open class RpcTcpServer(
 
         private fun write(data: String) {
             val bytes = data.toByteArray()
-            val len = bytes.size.let { (ByteBuffer.allocate(4).putInt(it).array()) }
+            val len = ByteBuffer.allocate(4).putInt(bytes.size).array()
             out.apply {
                 write(len)
                 write(bytes)
