@@ -15,6 +15,7 @@ public class SampleService implements RpcService {
 
     private String name;
     public boolean returnNothingCalled = false;
+    public final List<String> someStrings = new ArrayList<>();
 
     public SampleService() {
         this(SampleService.class.getSimpleName());
@@ -22,6 +23,9 @@ public class SampleService implements RpcService {
 
     public SampleService(String name) {
         this.name = name;
+        this.someStrings.add("String1");
+        this.someStrings.add("String2");
+        this.someStrings.add("String3");
     }
 
     @NotNull
@@ -31,42 +35,39 @@ public class SampleService implements RpcService {
 
     @RpcMethod
     public int doubleInteger(int i) {
-        LOG.debug("method doubleInteger with an integer called");
+        LOG.debug("Method doubleInteger with an integer called");
         return i * 2;
     }
 
     @RpcMethod
     public double doubleDouble(double i) {
-        LOG.debug("method doubleDouble with a floating-point number called called");
+        LOG.debug("Method doubleDouble with a floating-point number called called");
         return i * 2;
     }
 
     @RpcMethod
     public void returnNothing() {
         returnNothingCalled = true;
-        LOG.debug("method returnNothing called");
+        LOG.debug("Method returnNothing called");
     }
 
     @RpcMethod
     public String greet(String name) {
-        LOG.debug("method greet called");
+        LOG.debug("Method greet called");
         return "Hello, " + name + '!';
     }
 
     @RpcMethod
     public MyClass complex(MyClass myClass) {
-        LOG.debug("method complex called");
+        LOG.debug("Method complex called");
         myClass.d *= 2;
         return myClass;
     }
 
     @RpcMethod
     public List<String> getSomeStrings() {
-        List<String> list = new ArrayList<>();
-        list.add("String1");
-        list.add("String2");
-        list.add("String3");
-        return list;
+        LOG.debug("Method getSomeStrings called");
+        return someStrings;
     }
 
     public static class MyClass {
