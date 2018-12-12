@@ -34,7 +34,6 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.net.InetSocketAddress
 import java.nio.charset.Charset
-import java.util.*
 
 /**
  * @author Lars Ivar Hatledal
@@ -104,7 +103,7 @@ open class RpcHttpServer @JvmOverloads constructor(
             val contentType: String = t.requestHeaders.getFirst("Content-Type")
 
             if (contentType in legalContentTypes) {
-                val data = t.requestBody.reader().readText()
+                val data = t.requestBody.reader().use { it.readText() }
 
                 LOG.trace("Received: $data")
                 handler.handle(data)?.also { response ->

@@ -25,8 +25,6 @@
 package info.laht.yajrpc.net.http
 
 import info.laht.yajrpc.net.AbstractRpcClient
-import java.io.BufferedReader
-import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.Charset
@@ -53,13 +51,7 @@ class RpcHttpClient @JvmOverloads constructor(
             }
             connect()
         }
-        return StringBuilder().apply {
-            con.inputStream.bufferedReader().use {
-                while (true) {
-                    it.readLine()?.also { line -> append(line) } ?: break
-                }
-            }
-        }.toString()
+        return con.inputStream.bufferedReader().use { it.readText() }
     }
 
     override fun internalWrite(msg: String) {
