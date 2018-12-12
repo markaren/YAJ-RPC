@@ -82,22 +82,26 @@ class RpcHandler private constructor(
         val methodName: String
 
         val split = req.methodName!!.split("\\.".toRegex()).dropLastWhile { it.isEmpty() }
-        if (split.size == 2) {
-            val serviceName = split[0]
-            if (!services.containsKey(serviceName)) {
-                val msg = "No such registered service '$serviceName'"
-                LOG.warn(msg)
-                return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
+        when {
+            split.size == 2 -> {
+                val serviceName = split.first()
+                if (!services.containsKey(serviceName)) {
+                    val msg = "No such registered service '$serviceName'"
+                    LOG.warn(msg)
+                    return createErrorResponse(id, RpcError.ErrorType.METHOD_NOT_FOUND, msg)
+                }
+                service = services[serviceName]!!
+                methodName = split[1]
             }
-            service = services[serviceName]!!
-            methodName = split[1]
-        } else if (services.size == 1) {
-            service = services.values.toList()[0]
-            methodName = req.methodName!!
-        } else {
-            val msg = "Multiple services defined and method does not use '.' to separate service and method!"
-            LOG.warn(msg)
-            return createErrorResponse(id, RpcError.ErrorType.INVALID_REQUEST, msg)
+            services.size == 1 -> {
+                service = services.values.toList().first()
+                methodName = req.methodName!!
+            }
+            else -> {
+                val msg = "Multiple services defined and method does not use '.' to separate service and method!"
+                LOG.warn(msg)
+                return createErrorResponse(id, RpcError.ErrorType.INVALID_REQUEST, msg)
+            }
         }
 
         val paramCount = req.params.paramCount
