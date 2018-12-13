@@ -102,7 +102,7 @@ open class RpcHttpServer @JvmOverloads constructor(
 
             val contentType: String = t.requestHeaders.getFirst("Content-Type")
 
-            if (contentType in legalContentTypes) {
+            if (legalContentTypes.find { contentType.contains(it) } != null) {
                 val data = t.requestBody.reader().use { it.readText() }
 
                 LOG.trace("Received: $data")
