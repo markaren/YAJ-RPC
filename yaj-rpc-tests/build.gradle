@@ -8,6 +8,7 @@ dependencies {
     testImplementation project(':yaj-rpc-tcp')
     testImplementation project(':yaj-rpc-zmq')
     testImplementation project(':yaj-rpc-http')
+    testImplementation project(':yaj-rpc-okhttp')
     testImplementation project(':yaj-rpc-annotation-processor')
     kaptTest project(':yaj-rpc-annotation-processor')
 }

@@ -25,37 +25,32 @@
 package info.laht.yajrpc.net.http
 
 import info.laht.yajrpc.net.AbstractRpcClient
-import java.net.HttpURLConnection
-import java.net.URL
-import java.nio.charset.Charset
+import okhttp3.MediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody
+import java.io.IOException
 
 /**
- * @author Lars Ivar Hatledal
+ * @author ligi
  */
-class RpcHttpClient @JvmOverloads constructor(
+class OkHttpRpcClient @JvmOverloads constructor(
         host: String,
         port: Int,
-        context: String = "jsonrpc"
+        context: String = "jsonrpc",
+        private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder().build()
 ) : AbstractRpcClient() {
 
     private val url = "http://$host:$port/$context"
 
-    private fun connect(msg: String): String {
-        val con = (URL(url).openConnection() as HttpURLConnection).apply {
-            setRequestProperty("Content-Type", "application/json-rpc")
-            requestMethod = "POST"
-            doOutput = true
-            outputStream.use {
-                it.write(msg.toByteArray(Charset.forName("UTF-8")))
-                it.flush()
-            }
-            connect()
-        }
-        return con.inputStream.bufferedReader().use { it.readText() }
-    }
+    private fun executeRequest(msg: String) = okHttpClient.newCall(Request.Builder()
+            .url(url)
+            .post(RequestBody.create(MediaType.parse("application/json-rpc"), msg))
+            .build()).execute().body()?.string()
+            ?: throw(IOException("Could not execute request to $url with $msg"))
 
     override fun internalWrite(msg: String) {
-        messageReceived(connect(msg))
+        messageReceived(executeRequest(msg))
     }
 
 }
