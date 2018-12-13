@@ -2,7 +2,7 @@ package info.laht.yajrpc
 
 import info.laht.yajrpc.net.RpcClient
 import info.laht.yajrpc.net.RpcServer
-import info.laht.yajrpc.net.http.OkHttpRpcClient
+import info.laht.yajrpc.net.http.RpcOkHttpClient
 import info.laht.yajrpc.net.http.RpcHttpClient
 import info.laht.yajrpc.net.http.RpcHttpServer
 import info.laht.yajrpc.net.tcp.RpcTcpClient
@@ -114,7 +114,7 @@ open class TestHttp : AbstractTestServer() {
 class TestokHttp : TestHttp() {
 
     override fun createClient(port: Int): RpcClient {
-        return OkHttpRpcClient("localhost", port)
+        return RpcOkHttpClient("localhost", port)
     }
 
 }

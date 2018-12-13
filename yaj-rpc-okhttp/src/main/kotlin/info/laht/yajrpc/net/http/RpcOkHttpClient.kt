@@ -34,7 +34,7 @@ import java.io.IOException
 /**
  * @author ligi
  */
-class OkHttpRpcClient @JvmOverloads constructor(
+class RpcOkHttpClient @JvmOverloads constructor(
         host: String,
         port: Int,
         context: String = "jsonrpc",
