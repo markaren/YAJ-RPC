@@ -19,10 +19,10 @@ but the RPC implementations itself is totally independent from any networking lo
 Due to how cumbersome it is to publish artifacts to Maven Central, new releases can only be obtained using __jitpack__.
 
 
-```gradle
+```groovy
 allprojects {
     repositories {
-        ...
+        /*...*/
         maven { url 'https://jitpack.io' }
     }
 }
