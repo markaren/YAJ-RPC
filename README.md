@@ -3,7 +3,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/markaren/YAJ-RPC/issues)
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/info.laht/yaj-rpc/badge.svg)](https://mvnrepository.com/artifact/info.laht/yaj-rpc)
 [![](https://jitpack.io/v/markaren/YAJ-RPC.svg)](https://jitpack.io/#markaren/YAJ-RPC)
 
 
@@ -17,13 +16,21 @@ but the RPC implementations itself is totally independent from any networking lo
 
 
 ```gradle
+
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+
 dependencies {
     def yajrpc_version = "..."
-    implementation group: 'info.laht', name: 'yaj-rpc', version: yajrpc_version
-    implementation group: 'info.laht', name: 'yaj-rpc-ws', version: yajrpc_version
-    implementation group: 'info.laht', name: 'yaj-rpc-tcp', version: yajrpc_version
-    implementation group: 'info.laht', name: 'yaj-rpc-zmq', version: yajrpc_version
-    implementation group: 'info.laht', name: 'yaj-rpc-http', version: yajrpc_version
+    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc', version: yajrpc_version
+    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-ws', version: yajrpc_version
+    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-tcp', version: yajrpc_version
+    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-zmq', version: yajrpc_version
+    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-http', version: yajrpc_version
 }
 ```
 
