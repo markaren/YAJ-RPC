@@ -16,7 +16,6 @@ but the RPC implementations itself is totally independent from any networking lo
 
 
 ```gradle
-
 allprojects {
     repositories {
         ...
