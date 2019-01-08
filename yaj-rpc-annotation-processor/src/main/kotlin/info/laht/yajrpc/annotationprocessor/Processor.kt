@@ -27,9 +27,11 @@ annotation class GenerateRpcWrapper(val serviceName : String = "")
 @SupportedAnnotationTypes("info.laht.yajrpc.annotationprocessor.GenerateRpcWrapper")
 @SupportedOptions(GenerateWrappersProcessor.KAPT_KOTLIN_GENERATED_OPTION_NAME)
 class GenerateWrappersProcessor : AbstractProcessor() {
+
     companion object {
         const val KAPT_KOTLIN_GENERATED_OPTION_NAME = "kapt.kotlin.generated"
     }
+
     override fun process(annotations: MutableSet<out TypeElement>, roundEnv: RoundEnvironment): Boolean {
         val elements = roundEnv.getElementsAnnotatedWith(GenerateRpcWrapper::class.java)
         val kaptKotlinGeneratedDir = processingEnv.options[KAPT_KOTLIN_GENERATED_OPTION_NAME] ?: run {
