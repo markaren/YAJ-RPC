@@ -45,51 +45,45 @@ abstract class AbstractTestServer {
     abstract fun createClient(port: Int): RpcClient
 
     @Test
-    fun run() {
+    fun test1() {
 
         client.notify("SampleService.returnNothing")
         Thread.sleep(100)
         Assertions.assertTrue(service.returnNothingCalled)
 
         client.write("SampleService.greet", RpcListParams("Clint Eastwood")).get().also {
-            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
+            LOG.info("Response=${it.getResult<String>()}")
         }
 
         client.write("greet", RpcListParams("Clint Eastwood")).get().also {
-            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
+            LOG.info("Response=${it.getResult<String>()}")
         }
 
-        testWrapper()
+    }
+
+    @Test
+    fun test2() {
+
+        client.write("complex", RpcListParams( SampleService.MyClass(1,2.0, "foo"))).get().also {
+
+            val result = it.getResult<SampleService.MyClass>()!!
+            Assertions.assertEquals(result.i,  1)
+            Assertions.assertEquals(result.d, 4.0)
+            Assertions.assertEquals(result.s, "foo")
+
+            LOG.info("Response=$result")
+        }
+
     }
 
     @Test
-    fun run2() {
-
-        client.notify("SampleService.returnNothing")
-        Thread.sleep(100)
-        Assertions.assertTrue(service.returnNothingCalled)
-
-        client.write("SampleService.greet", RpcListParams("Clint Eastwood")).get().also {
-            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
-        }
-
-        client.write("greet", RpcListParams("Clint Eastwood")).get().also {
-            LOG.info("Synchronous response=${it.getResult(String::class.java)}")
-        }
-
-    }
-
     private fun testWrapper(){
         val wrapper = SampleServiceWrapper(client)
 
         wrapper.returnNothing()
         Assertions.assertEquals(wrapper.greet("Clint Eastwood"), service.greet("Clint Eastwood"))
 
-        val clazz = SampleService.MyClass().apply {
-            i = 1
-            d = 2.0
-            s = "foo"
-        }
+        val clazz = SampleService.MyClass(1,2.0, "foo")
         val result = wrapper.complex(clazz)
         Assertions.assertEquals(result.i,  1)
         Assertions.assertEquals(result.d, 4.0)
@@ -111,7 +105,7 @@ open class TestHttp : AbstractTestServer() {
 
 }
 
-class TestokHttp : TestHttp() {
+class TestOkHttp : TestHttp() {
 
     override fun createClient(port: Int): RpcClient {
         return RpcOkHttpClient("localhost", port)
