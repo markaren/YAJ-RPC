@@ -87,5 +87,3 @@ object YAJRPC {
     }
 
 }
-
-
