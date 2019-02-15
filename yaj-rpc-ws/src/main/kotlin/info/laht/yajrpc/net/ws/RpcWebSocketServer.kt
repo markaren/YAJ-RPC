@@ -33,6 +33,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.lang.Exception
 import java.net.InetSocketAddress
+import java.util.*
 
 /**
  * @author Lars Ivar Hatledal
@@ -43,13 +44,14 @@ open class RpcWebSocketServer(
 
     override var port: Int? = null
 
-    private val clients = mutableSetOf<WebSocket>()
+    private val clients = Collections.synchronizedSet(mutableSetOf<WebSocket>())
     private var ws: WebSocketServerImpl? = null
 
     override fun start(port: Int) {
         if (ws == null) {
             this.port = port
             ws = WebSocketServerImpl(port).also {
+                it.isReuseAddr = true
                 it.start()
                 LOG.info("${javaClass.simpleName} listening for connections on port: $port")
             }
@@ -59,9 +61,13 @@ open class RpcWebSocketServer(
     }
 
     override fun stop() {
-        ws?.also {
-            clients.forEach { it.close() }
-            it.stop()
+        ws?.also { server ->
+            synchronized(clients) {
+                clients.forEach { client ->
+                    client.close()
+                }
+            }
+            server.stop()
             ws = null
             LOG.info("${javaClass.simpleName} stopped!")
         }

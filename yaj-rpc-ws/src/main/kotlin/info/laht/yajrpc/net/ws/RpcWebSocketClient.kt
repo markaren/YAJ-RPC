@@ -45,14 +45,14 @@ open class RpcWebSocketClient(
 
     override fun close() {
         super.close()
-        ws.closeBlocking()
+        ws.close()
     }
 
     override fun internalWrite(msg: String) {
         ws.send(msg)
     }
 
-    inner class WebSocketClientImpl : WebSocketClient(uri) {
+    private inner class WebSocketClientImpl : WebSocketClient(uri) {
 
         override fun onOpen(handshake: ServerHandshake?) {
             LOG.info("WS client connected")
