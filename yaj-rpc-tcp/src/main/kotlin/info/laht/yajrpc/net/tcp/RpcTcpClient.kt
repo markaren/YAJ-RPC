@@ -27,8 +27,6 @@ package info.laht.yajrpc.net.tcp
 import info.laht.yajrpc.net.AbstractRpcClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.Socket
 import java.nio.ByteBuffer
@@ -40,8 +38,8 @@ open class RpcTcpClient(
 ) : AbstractRpcClient() {
 
     private val socket: Socket = Socket(host, port)
-    private val `in` = socket.getInputStream().buffered()
-    private val out = socket.getOutputStream().buffered()
+    private val bis = socket.getInputStream().buffered()
+    private val bos = socket.getOutputStream().buffered()
 
     init {
         start()
@@ -54,14 +52,14 @@ open class RpcTcpClient(
             try {
                 while (true) {
 
-                    `in`.read(lenBuf)
-                    val len = ByteBuffer.wrap(lenBuf).int
-                    val msg = ByteArray(len).also {
-                        `in`.read(it, 0, len)
-                    }.toString(Charset.defaultCharset())
-
-                    messageReceived(msg)
-
+                    val read = bis.read(lenBuf, 0, lenBuf.size)
+                    if (read == lenBuf.size) {
+                        val len = ByteBuffer.wrap(lenBuf).int
+                        val msg = ByteArray(len).also {
+                            bis.read(it, 0, len)
+                        }.toString(Charset.forName("UTF-8"))
+                        messageReceived(msg)
+                    }
                 }
             } catch (ex: IOException) {
                 LOG.trace("Caught exception", ex)
@@ -77,12 +75,12 @@ open class RpcTcpClient(
 
     override fun internalWrite(msg: String) {
 
-        val bytes = msg.toByteArray()
+        val bytes = msg.toByteArray(Charset.forName("UTF-8"))
         val len = ByteBuffer.allocate(4).putInt(bytes.size).array()
 
-        out.write(len)
-        out.write(bytes)
-        out.flush()
+        bos.write(len)
+        bos.write(bytes)
+        bos.flush()
     }
 
     private companion object {
