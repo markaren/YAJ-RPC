@@ -26,6 +26,7 @@ package info.laht.yajrpc.net.zmq
 
 
 import info.laht.yajrpc.net.AbstractRpcClient
+import org.zeromq.SocketType
 import org.zeromq.ZContext
 import org.zeromq.ZMQ
 
@@ -35,7 +36,7 @@ class RpcZmqClient(
 ) : AbstractRpcClient() {
 
     private val ctx = ZContext(1)
-    private val socket = ctx.createSocket(ZMQ.REQ).apply {
+    private val socket = ctx.createSocket(SocketType.REQ).apply {
         connect("tcp://$host:$port")
     }
 

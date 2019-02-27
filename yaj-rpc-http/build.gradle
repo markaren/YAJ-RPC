@@ -1,10 +1,6 @@
 
-apply from: rootProject.file("publisher.gradle")
+apply from: rootProject.file("gradle/mavenpublish.gradle")
 
 dependencies {
     api project(':yaj-rpc')
-}
-
-pomDescription {
-    description = "HTTP client implementation for YAJ-RPC"
 }

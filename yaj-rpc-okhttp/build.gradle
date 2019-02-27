@@ -1,10 +1,7 @@
-apply from: rootProject.file("publisher.gradle")
+
+apply from: rootProject.file("gradle/mavenpublish.gradle")
 
 dependencies {
     api project(':yaj-rpc')
     compile 'com.squareup.okhttp3:okhttp:3.12.0'
-}
-
-pomDescription {
-    description = "OKHTTP client implementation for YAJ-RPC"
 }
