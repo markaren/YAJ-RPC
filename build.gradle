@@ -1,6 +1,6 @@
 
 plugins {
-    id "org.jetbrains.kotlin.jvm" version "1.3.11" apply false //apply in sub-projects
+    id "org.jetbrains.kotlin.jvm" version "1.3.21" apply false //apply in sub-projects
 }
 
 println "Gradle version is ${gradle.getGradleVersion()}"
@@ -15,16 +15,15 @@ subprojects { sub ->
         mavenCentral()
     }
 
-    def junit_version = "5.3.2"
-    def slf4j_version = "1.7.25"
-
     dependencies {
 
         implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
+        def slf4j_version = "1.7.25"
         implementation group: 'org.slf4j', name: 'slf4j-api', version: "$slf4j_version"
         runtimeOnly group: 'org.slf4j', name: 'slf4j-log4j12', version: "$slf4j_version"
 
+        def junit_version = "5.3.2"
         testImplementation("org.junit.jupiter:junit-jupiter-api:$junit_version")
         testImplementation("org.junit.jupiter:junit-jupiter-params:$junit_version")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit_version")
@@ -49,9 +48,7 @@ subprojects { sub ->
             javaParameters = true
         }
     }
-
-
+    
     compileTestJava.options.compilerArgs.add '-parameters'
 
 }
-

@@ -78,9 +78,8 @@ interface RpcClient : Closeable {
  */
 abstract class AbstractRpcClient : RpcClient {
 
+    private val executor = Executors.newSingleThreadExecutor()
     private val callbacks = mutableMapOf<String, Consumer<RpcResponse>>()
-
-    private val executor = Executors.newSingleThreadExecutor();
 
     override fun notify(methodName: String, params: RpcParams) {
         internalWrite(RpcRequestOut(methodName, params).toJson())

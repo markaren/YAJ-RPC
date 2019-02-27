@@ -71,9 +71,16 @@ public class SampleService implements RpcService {
     }
 
     public static class MyClass {
-        int i;
-        double d;
-        String s;
+
+        public int i;
+        public double d;
+        public String s;
+
+        public MyClass(int i, double d, String s) {
+            this.i = i;
+            this.d = d;
+            this.s = s;
+        }
 
         @Override
         public String toString() {

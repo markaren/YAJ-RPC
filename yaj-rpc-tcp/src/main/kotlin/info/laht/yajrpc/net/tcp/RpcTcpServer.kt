@@ -28,8 +28,6 @@ import info.laht.yajrpc.RpcHandler
 import info.laht.yajrpc.net.RpcServer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
 import java.io.IOException
 import java.net.ServerSocket
 import java.net.Socket
@@ -88,8 +86,8 @@ open class RpcTcpServer(
             socket: Socket
     ) : Runnable {
 
-        private val `in` = socket.getInputStream().buffered()
-        private val out = socket.getOutputStream().buffered()
+        private val bis = socket.getInputStream().buffered()
+        private val bos = socket.getOutputStream().buffered()
 
         override fun run() {
 
@@ -97,29 +95,31 @@ open class RpcTcpServer(
                 val lenBuf = ByteArray(4)
                 while (!stop) {
 
-                    `in`.read(lenBuf, 0, lenBuf.size)
-                    val len = ByteBuffer.wrap(lenBuf).int
-                    val msg = ByteArray(len).also {
-                        `in`.read(it, 0, len)
-                    }.toString(Charset.defaultCharset()).replace(0.toChar(), ' ').trim()
+                    val read = bis.read(lenBuf, 0, lenBuf.size)
+                    if (read == lenBuf.size) {
+                        val len = ByteBuffer.wrap(lenBuf).int
+                        val msg = ByteArray(len).also {
+                            bis.read(it, 0, len)
+                        }.toString(Charset.forName("UTF-8"))
 
-                    if (msg.isNotEmpty()) {
-                        LOG.trace("Received: $msg")
-                        handler.handle(msg)?.also {
-                            write(it)
+                        if (msg.isNotEmpty()) {
+                            LOG.trace("Received: $msg")
+                            handler.handle(msg)?.also {
+                                write(it)
+                            }
                         }
                     }
 
                 }
             } catch (ex: IOException) {
-                LOG.trace("Exception caught in TCP client handler thread", ex)
+                LOG.trace("Exception caught bis TCP client handler thread", ex)
             }
         }
 
         private fun write(data: String) {
-            val bytes = data.toByteArray()
+            val bytes = data.toByteArray(Charset.forName("UTF-8"))
             val len = ByteBuffer.allocate(4).putInt(bytes.size).array()
-            out.apply {
+            bos.apply {
                 write(len)
                 write(bytes)
                 flush()
