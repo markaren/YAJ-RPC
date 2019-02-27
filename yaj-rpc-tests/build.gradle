@@ -2,6 +2,8 @@ plugins {
     id "org.jetbrains.kotlin.kapt"
 }
 
+apply from: rootProject.file("gradle/junit.gradle")
+
 dependencies {
     testImplementation project(':yaj-rpc')
     testImplementation project(':yaj-rpc-ws')
