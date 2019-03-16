@@ -3,10 +3,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/markaren/YAJ-RPC/issues)
 
-[![](https://jitpack.io/v/markaren/YAJ-RPC.svg)](https://jitpack.io/#markaren/YAJ-RPC)
+[![](https://jitpack.io/v/markaren/YAJ-RPC.svg)](https://jitpack.io/#markaren/YAJ-RPC) 
+[![Join the chat at https://gitter.im/markaren/YAJ-RPC](https://badges.gitter.im/markaren/YAJ-RPC.svg)](https://gitter.im/markaren/YAJ-RPC?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 
-[![CircleCI](https://circleci.com/gh/markaren/YAJ-RPC/tree/master.svg?style=svg)](https://circleci.com/gh/markaren/YAJ-RPC/tree/master) [![Join the chat at https://gitter.im/markaren/YAJ-RPC](https://badges.gitter.im/markaren/YAJ-RPC.svg)](https://gitter.im/markaren/YAJ-RPC?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![CircleCI](https://circleci.com/gh/markaren/YAJ-RPC/tree/master.svg?style=svg)](https://circleci.com/gh/markaren/YAJ-RPC/tree/master) 
+[![Build Status](https://dev.azure.com/laht/laht/_apis/build/status/markaren.YAJ-RPC?branchName=master)](https://dev.azure.com/laht/laht/_build/latest?definitionId=5&branchName=master)
 
 Yet Another JSON-RPC (YAJ-RPC) is a [JSON RPC](https://www.jsonrpc.org/specification) 2.0 implementation for JVM languages written in [Kotlin](https://kotlinlang.org/).
 
