@@ -38,20 +38,21 @@ import java.util.*
 /**
  * @author Lars Ivar Hatledal
  */
-open class RpcWebSocketServer(
-        private val handler: RpcHandler
+open class RpcWebSocketServer @JvmOverloads constructor(
+        private val handler: RpcHandler,
+        private val reuseAddress: Boolean = true
 ) : RpcServer {
 
     override var port: Int? = null
 
-    private val clients = Collections.synchronizedSet(mutableSetOf<WebSocket>())
     private var ws: WebSocketServerImpl? = null
+    private val clients = Collections.synchronizedSet(mutableSetOf<WebSocket>())
 
     override fun start(port: Int) {
         if (ws == null) {
             this.port = port
             ws = WebSocketServerImpl(port).also {
-                it.isReuseAddr = true
+                it.isReuseAddr = reuseAddress
                 it.start()
                 LOG.info("${javaClass.simpleName} listening for connections on port: $port")
             }
@@ -108,7 +109,7 @@ open class RpcWebSocketServer(
         }
     }
 
-    companion object {
+    private companion object {
         val LOG: Logger = LoggerFactory.getLogger(RpcWebSocketServer::class.java)
     }
 
