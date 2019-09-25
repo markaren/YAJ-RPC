@@ -8,7 +8,7 @@
 
 
 [![CircleCI](https://circleci.com/gh/markaren/YAJ-RPC/tree/master.svg?style=svg)](https://circleci.com/gh/markaren/YAJ-RPC/tree/master) 
-[![Build Status](https://dev.azure.com/laht/laht/_apis/build/status/markaren.YAJ-RPC?branchName=master)](https://dev.azure.com/laht/laht/_build/latest?definitionId=5&branchName=master)
+
 
 Yet Another JSON-RPC (YAJ-RPC) is a [JSON RPC](https://www.jsonrpc.org/specification) 2.0 implementation for JVM languages written in [Kotlin](https://kotlinlang.org/).
 
