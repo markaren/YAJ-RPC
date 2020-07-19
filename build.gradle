@@ -14,8 +14,12 @@ subprojects { sub ->
     apply plugin: 'java-library'
     apply plugin: 'kotlin'
 
+    group = "info.laht.yaj-rpc"
+    version = "0.10.7"
+
     repositories {
         mavenCentral()
+        maven { url  "https://dl.bintray.com/laht/mvn"  }
     }
 
     dependencies {

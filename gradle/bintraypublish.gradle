@@ -1,0 +1,20 @@
+
+if (hasProperty("bintrayUser") && hasProperty("bintrayKey")) {
+
+    apply plugin: "com.jfrog.bintray"
+
+    bintray {
+        user = bintrayUser
+        key = bintrayKey
+        publish = true
+        publications = ["maven"]
+        pkg {
+            repo = "mvn"
+            name = "YAY-RPC"
+            websiteUrl = "https://github.com/markaren/YAJ-RPC"
+            vcsUrl = "https://github.com/markaren/YAJ-RPC"
+            licenses = ["MIT"]
+        }
+    }
+
+}

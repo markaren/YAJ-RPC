@@ -1,6 +1,7 @@
 
 apply from: rootProject.file("gradle/junit.gradle")
 apply from: rootProject.file("gradle/mavenpublish.gradle")
+apply from: rootProject.file("gradle/bintraypublish.gradle")
 
 dependencies {
     api project(':yaj-rpc')
