@@ -18,25 +18,25 @@ but the RPC implementations itself is totally independent from any networking lo
 
 ---
 
-Due to how cumbersome it is to publish artifacts to Maven Central, new releases can only be obtained using __jitpack__.
-
+Artifacts are available through [Bintray](https://bintray.com/beta/#/laht/mvn/YAY-RPC?tab=overview).
 
 ```groovy
-allprojects {
-    repositories {
-        /*...*/
-        maven { url 'https://jitpack.io' }
-    }
+
+repositories {
+    /*...*/
+    maven { url "https://dl.bintray.com/laht/mvn" }
 }
 
 dependencies {
     def yajrpc_version = "..."
-    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc', version: yajrpc_version
-    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-ws', version: yajrpc_version
-    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-tcp', version: yajrpc_version
-    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-zmq', version: yajrpc_version
-    implementation group: 'com.github.markaren.YAJ-RPC', name: 'yaj-rpc-http', version: yajrpc_version
+    implementation group: 'info.laht.yaj-rpc', name: 'yaj-rpc', version: yajrpc_version
+    implementation group: 'info.laht.yaj-rpc', name: 'yaj-rpc-ws', version: yajrpc_version
+    implementation group: 'info.laht.yaj-rpc', name: 'yaj-rpc-tcp', version: yajrpc_version
+    implementation group: 'info.laht.yaj-rpc', name: 'yaj-rpc-zmq', version: yajrpc_version
+    implementation group: 'info.laht.yaj-rpc', name: 'yaj-rpc-http', version: yajrpc_version
 }
 ```
+
+[jitpack](https://jitpack.io/#markaren/YAJ-RPC) may also be used.
 
 To get started head over to the [Wiki](https://github.com/markaren/YAJ-RPC/wiki)!
